@@ -1,0 +1,52 @@
+@model List<MatchRow>
+@{
+    var clubName = ViewBag.ClubName as string;
+    ViewData["Title"] = "Fixtures";
+    ViewData["Description"] = string.IsNullOrWhiteSpace(clubName)
+        ? "The matches still to come for your club."
+        : $"The matches still to come for {clubName}.";
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No fixtures scheduled</h3>
+        <p>Check back once the coordinator adds the next round of matches.</p>
+        <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Results">View past results</a>
+    </div>
+}
+else
+{
+    <div class="grid grid-2">
+        @foreach (var match in Model)
+        {
+            <article class="card">
+                <div class="card-head">
+                    <h2>vs @match.Opponent</h2>
+                    <span class="pill pill-gold">@match.MatchDate.ToString("dd MMM")</span>
+                </div>
+                <dl class="kv">
+                    <dt>Date</dt>
+                    <dd>@match.MatchDate.ToString("dddd dd MMMM yyyy")</dd>
+                    <dt>Kickoff</dt>
+                    <dd>@match.KickoffTime.ToString(@"hh\:mm")</dd>
+                    <dt>Venue</dt>
+                    <dd>@match.StadiumName</dd>
+                    <dt>Competition</dt>
+                    <dd>@(string.IsNullOrWhiteSpace(match.CompetitionName) ? "Friendly" : match.CompetitionName)</dd>
+                    <dt>Formation</dt>
+                    <dd>@(string.IsNullOrWhiteSpace(match.Formation) ? "To be decided" : match.Formation)</dd>
+                </dl>
+                <div class="form-actions">
+                    <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Details" asp-route-id="@match.MatchId">Match details</a>
+                    @if (match.HasSquad)
+                    {
+                        <a class="btn btn-secondary btn-small" asp-controller="Squads" asp-action="Details" asp-route-id="@match.MatchId">View squad</a>
+                    }
+                </div>
+            </article>
+        }
+    </div>
+}

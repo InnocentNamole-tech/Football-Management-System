@@ -1,0 +1,52 @@
+@model ClubRow
+@{
+    var canBrowseAll = ViewBag.CanBrowseAll == true;
+    ViewData["Title"] = Model.ClubName;
+    ViewData["Description"] = "Club profile, home ground and team information.";
+    ViewData["Crumb"] = canBrowseAll ? "Clubs" : "My club";
+    ViewData["CrumbUrl"] = canBrowseAll ? Url.Action("Index", "Clubs") : Url.Action("MyClub", "Clubs");
+}
+
+<partial name="_PageHeader" />
+
+<div class="grid grid-2">
+    <div class="card">
+        <div class="card-head">
+            <h2>Club profile</h2>
+            <span class="pill pill-gold">@Model.AgeGroup @Model.Gender</span>
+        </div>
+        <dl class="kv">
+            <dt>Club name</dt>
+            <dd>@Model.ClubName</dd>
+            <dt>Founded</dt>
+            <dd>@Model.FoundedYear</dd>
+            <dt>City</dt>
+            <dd>@Model.CityName</dd>
+            <dt>Province</dt>
+            <dd>@Model.ProvinceName</dd>
+        </dl>
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h2>Home ground</h2></div>
+        <dl class="kv">
+            <dt>Stadium</dt>
+            <dd>@Model.StadiumName</dd>
+            <dt>Capacity</dt>
+            <dd>@Model.Capacity.ToString("N0") seats</dd>
+            <dt>Location</dt>
+            <dd>@Model.CityName, @Model.ProvinceName</dd>
+        </dl>
+        <div class="form-actions">
+            @if (canBrowseAll)
+            {
+                <a class="btn btn-secondary" asp-controller="Clubs" asp-action="Index">Back to clubs</a>
+            }
+            else
+            {
+                <a class="btn btn-secondary" asp-controller="Clubs" asp-action="MyClub">Back to my club</a>
+            }
+            <a class="btn btn-secondary" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+        </div>
+    </div>
+</div>

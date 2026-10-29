@@ -1,0 +1,47 @@
+@model List<CompetitionEntryRow>
+@{
+    ViewData["Title"] = "Record outcomes";
+    ViewData["Description"] = "Set the result and stage reached for approved clubs in your competitions.";
+    ViewData["Crumb"] = "Competitions";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+}
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="card empty">
+        <p>No approved entries yet.</p>
+        <p>Approve a club request before recording its outcome.</p>
+        <a class="btn btn-primary" asp-action="Requests" asp-route-status="Pending">Review requests</a>
+    </div>
+}
+else
+{
+    <div class="table-wrap card">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>Competition</th>
+                    <th>Club</th>
+                    <th>Outcome</th>
+                    <th>Stage reached</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in Model)
+                {
+                    <tr>
+                        <td><strong>@entry.CompetitionName</strong><br /><span class="help">@entry.CompetitionType · @entry.Gender @entry.AgeGroup</span></td>
+                        <td>@entry.ClubName</td>
+                        <td>@(entry.Outcome ?? "Not recorded")</td>
+                        <td>@(entry.StageReached ?? "—")</td>
+                        <td class="text-right">
+                            <a class="btn btn-small" asp-action="Outcome" asp-route-id="@entry.CompetitionClubId">Record</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,144 @@
+@{
+    ViewData["Title"] = "Leaderboards";
+    ViewData["Description"] = "The club's top scorers, creators and card collectors across the season.";
+
+    var totals = ViewBag.Totals as List<PlayerTotalsRow> ?? new List<PlayerTotalsRow>();
+    var scorers = ViewBag.TopScorers as List<LeaderRow> ?? new List<LeaderRow>();
+    var assists = ViewBag.TopAssists as List<LeaderRow> ?? new List<LeaderRow>();
+    var yellow = ViewBag.YellowCards as List<LeaderRow> ?? new List<LeaderRow>();
+    var red = ViewBag.RedCards as List<LeaderRow> ?? new List<LeaderRow>();
+}
+
+<partial name="_PageHeader" />
+
+@if (totals.Count == 0)
+{
+    <div class="empty">
+        <h3>No player statistics yet</h3>
+        <p>Leaderboards fill up as soon as match statistics are recorded.</p>
+        <a class="btn btn-secondary btn-small" asp-controller="Statistics" asp-action="Index">View matches</a>
+    </div>
+}
+else
+{
+    <div class="grid grid-2">
+        <div class="card">
+            <div class="card-head"><h2>Top scorers</h2></div>
+            @if (scorers.Count == 0)
+            {
+                <p class="muted mb-0">No goals recorded yet.</p>
+            }
+            else
+            {
+                <ul class="dash-list">
+                    @foreach (var row in scorers)
+                    {
+                        <li>
+                            <span class="who"><strong>@row.FullName</strong><small>@row.PositionName · #@row.JerseyNumber</small></span>
+                            <span class="leader-number">@row.Value</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h2>Top assists</h2></div>
+            @if (assists.Count == 0)
+            {
+                <p class="muted mb-0">No assists recorded yet.</p>
+            }
+            else
+            {
+                <ul class="dash-list">
+                    @foreach (var row in assists)
+                    {
+                        <li>
+                            <span class="who"><strong>@row.FullName</strong><small>@row.PositionName · #@row.JerseyNumber</small></span>
+                            <span class="leader-number">@row.Value</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h2>Most yellow cards</h2></div>
+            @if (yellow.Count == 0)
+            {
+                <p class="muted mb-0">No yellow cards recorded.</p>
+            }
+            else
+            {
+                <ul class="dash-list">
+                    @foreach (var row in yellow)
+                    {
+                        <li>
+                            <span class="who"><strong>@row.FullName</strong><small>@row.PositionName · #@row.JerseyNumber</small></span>
+                            <span class="pill pill-pending">@row.Value</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h2>Most red cards</h2></div>
+            @if (red.Count == 0)
+            {
+                <p class="muted mb-0">No red cards recorded.</p>
+            }
+            else
+            {
+                <ul class="dash-list">
+                    @foreach (var row in red)
+                    {
+                        <li>
+                            <span class="who"><strong>@row.FullName</strong><small>@row.PositionName · #@row.JerseyNumber</small></span>
+                            <span class="pill pill-rejected">@row.Value</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-head"><h2>Full squad totals</h2></div>
+        <div class="table-wrap">
+            <table class="data">
+                <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>#</th>
+                    <th>Position</th>
+                    <th>Apps</th>
+                    <th>Goals</th>
+                    <th>Assists</th>
+                    <th>Yellow</th>
+                    <th>Red</th>
+                    <th>Minutes</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var row in totals)
+                {
+                    <tr>
+                        <td><strong>@row.FullName</strong></td>
+                        <td>@row.JerseyNumber</td>
+                        <td>@row.PositionName</td>
+                        <td>@row.MatchesPlayed</td>
+                        <td>@row.Goals</td>
+                        <td>@row.Assists</td>
+                        <td>@row.YellowCards</td>
+                        <td>@row.RedCards</td>
+                        <td>@row.MinutesPlayed</td>
+                        <td><span class="pill @(row.IsActive ? "pill-active" : "pill-inactive")">@(row.IsActive ? "Active" : "Inactive")</span></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

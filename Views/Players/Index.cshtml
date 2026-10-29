@@ -1,0 +1,78 @@
+@model List<PlayerOverview>
+@{
+    var canEdit = ViewBag.CanEdit is true;
+    var clubName = ViewBag.ClubName as string;
+    ViewData["Title"] = "Players";
+    ViewData["Description"] = string.IsNullOrWhiteSpace(clubName)
+        ? "The players registered at your club."
+        : $"The registered players of {clubName}.";
+
+    if (canEdit)
+    {
+        ViewData["PrimaryText"] = "Register player";
+        ViewData["PrimaryUrl"] = Url.Action("Create", "Players") ?? "/Players/Create";
+    }
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No players registered</h3>
+        <p>Once players are added they appear here with their jersey number, position and status.</p>
+        @if (canEdit)
+        {
+            <a class="btn btn-primary btn-small" asp-controller="Players" asp-action="Create">Register the first player</a>
+        }
+    </div>
+}
+else
+{
+    <p class="muted small">@Model.Count player@(Model.Count == 1 ? "" : "s") · @Model.Count(p => p.IsActive) active</p>
+
+    <div class="player-grid">
+        @foreach (var player in Model)
+        {
+            <article class="player-card">
+                <span class="jersey">@player.JerseyNumber</span>
+                <div class="player-top">
+                    <div class="avatar">
+                        @if (!string.IsNullOrWhiteSpace(player.ProfilePhotoPath))
+                        {
+                            <img src="@player.ProfilePhotoPath" alt="Photo of @player.FullName" />
+                        }
+                        else
+                        {
+                            @player.Initials
+                        }
+                    </div>
+                    <div>
+                        <div class="player-name"><span class="first">@player.FirstName</span> <span class="last">@player.LastName</span></div>
+                        <div class="player-pos">@player.PositionName</div>
+                        <div class="small muted">@player.ClubName</div>
+                    </div>
+                </div>
+                <div class="player-meta">
+                    <span><strong>@player.Nickname</strong></span>
+                    @if (!string.IsNullOrWhiteSpace(player.PlayerStyleName))
+                    {
+                        <span>@player.PlayerStyleName</span>
+                    }
+                    <span>@player.CityName</span>
+                </div>
+                <div class="player-foot">
+                    <span class="pill @(player.IsActive ? "pill-active" : "pill-inactive")">@(player.IsActive ? "Active" : "Inactive")</span>
+                    <div class="btn-row">
+                        <a class="btn btn-secondary btn-small" asp-controller="Players" asp-action="Details" asp-route-id="@player.PlayerId">View</a>
+                        @if (canEdit && player.IsActive)
+                        {
+                            <a class="btn btn-secondary btn-small" asp-controller="Players" asp-action="Edit" asp-route-id="@player.PlayerId">Edit</a>
+                            <a class="btn btn-danger btn-small" asp-controller="Players" asp-action="Deactivate" asp-route-id="@player.PlayerId">Deactivate</a>
+                        }
+                    </div>
+                </div>
+            </article>
+        }
+    </div>
+}

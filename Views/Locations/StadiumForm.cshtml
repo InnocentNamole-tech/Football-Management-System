@@ -1,0 +1,61 @@
+@model StadiumFormVm
+@{
+    var editing = Model.StadiumId > 0;
+    ViewData["Title"] = editing ? "Edit stadium" : "Add stadium";
+    ViewData["Description"] = editing
+        ? "Update the stadium name, capacity, surface or city."
+        : "Add a stadium so clubs and matches can use it as a venue.";
+    ViewData["Crumb"] = "Stadiums";
+    ViewData["CrumbUrl"] = Url.Action("Stadiums");
+
+    var cities = ViewBag.Cities as List<LookupItem> ?? new List<LookupItem>();
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <form asp-controller="Locations" asp-action="@(editing ? "EditStadium" : "CreateStadium")" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+        <input type="hidden" asp-for="StadiumId" />
+
+        <div class="form-grid">
+            <div class="form-group span-2">
+                <label asp-for="StadiumName">Stadium name <span class="req">*</span></label>
+                <input asp-for="StadiumName" class="input" />
+                <span asp-validation-for="StadiumName" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CityId">City <span class="req">*</span></label>
+                <select asp-for="CityId" class="input">
+                    <option value="">Choose a city</option>
+                    @foreach (var city in cities)
+                    {
+                        <option value="@city.Id">@city.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="CityId" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Capacity">Capacity <span class="req">*</span></label>
+                <input asp-for="Capacity" class="input" type="number" min="1" max="200000" />
+                <span class="help">Number of seats, from 1 to 200,000.</span>
+                <span asp-validation-for="Capacity" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Surface">Playing surface <span class="req">*</span></label>
+                <select asp-for="Surface" class="input">
+                    @foreach (var surface in StadiumSurfaces.All)
+                    {
+                        <option value="@surface">@surface</option>
+                    }
+                </select>
+                <span asp-validation-for="Surface" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">@(editing ? "Save stadium" : "Add stadium")</button>
+            <a class="btn btn-secondary" asp-action="Stadiums">Cancel</a>
+        </div>
+    </form>
+</div>

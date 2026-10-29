@@ -1,0 +1,35 @@
+@model StadiumRow
+@{
+    ViewData["Title"] = Model.StadiumName;
+    ViewData["Description"] = "Stadium profile, capacity, surface and the city it serves.";
+    ViewData["Crumb"] = "Stadiums";
+    ViewData["CrumbUrl"] = Url.Action("Stadiums");
+}
+
+<partial name="_PageHeader" />
+
+<div class="grid grid-2">
+    <section class="card">
+        <div class="card-head">
+            <h2>Stadium details</h2>
+            <span class="pill pill-gold">@Model.Surface</span>
+        </div>
+        <dl class="kv">
+            <dt>Stadium</dt>
+            <dd>@Model.StadiumName</dd>
+            <dt>City</dt>
+            <dd>@Model.CityName</dd>
+            <dt>Province</dt>
+            <dd>@Model.ProvinceName</dd>
+            <dt>Capacity</dt>
+            <dd>@Model.Capacity.ToString("N0") seats</dd>
+            <dt>Surface</dt>
+            <dd>@Model.Surface</dd>
+        </dl>
+        <div class="form-actions">
+            <a class="btn btn-secondary btn-small" asp-action="EditStadium" asp-route-id="@Model.StadiumId">Edit stadium</a>
+            <a class="btn btn-secondary btn-small" asp-action="City" asp-route-id="@Model.CityId">View city</a>
+            <a class="btn btn-secondary btn-small" asp-action="Stadiums">Back to stadiums</a>
+        </div>
+    </section>
+</div>

@@ -1,0 +1,63 @@
+@model CompetitionRow
+@{
+    var canEdit = ViewBag.CanEdit is true;
+    var canRequest = ViewBag.CanRequest is true;
+    ViewData["Title"] = Model.CompetitionName;
+    ViewData["Description"] = "Competition details, entry requirements and the current club request.";
+    ViewData["Crumb"] = "Competitions";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+    if (canEdit)
+    {
+        ViewData["PrimaryText"] = "Edit competition";
+        ViewData["PrimaryUrl"] = Url.Action("Edit", new { id = Model.CompetitionId });
+    }
+}
+<partial name="_PageHeader" />
+
+<div class="grid grid-2">
+    <section class="card">
+        <h2 class="section-title">Overview</h2>
+        <dl class="kv">
+            <div><dt>Type</dt><dd>@Model.CompetitionType</dd></div>
+            <div><dt>Division</dt><dd>@Model.Gender @Model.AgeGroup</dd></div>
+            <div><dt>Status</dt><dd><span class="pill pill-muted">@Model.CompetitionStatus</span></dd></div>
+            <div><dt>Starts</dt><dd>@Model.StartDate.ToString("dd MMM yyyy") at @Model.StartTime.ToString(@"hh\:mm")</dd></div>
+            <div><dt>Ends</dt><dd>@Model.EndDate.ToString("dd MMM yyyy")</dd></div>
+            <div><dt>Teams</dt><dd>@Model.ApprovedCount approved · @Model.TeamCount places</dd></div>
+            <div><dt>Venue</dt><dd>@Model.StadiumName, @Model.CityName</dd></div>
+            <div><dt>Organiser</dt><dd>@Model.OrganiserName</dd></div>
+        </dl>
+    </section>
+
+    <section class="card">
+        <h2 class="section-title">Entry &amp; rewards</h2>
+        <dl class="kv">
+            <div><dt>Affiliation fee</dt><dd>R @Model.AffiliationFee.ToString("0.00")</dd></div>
+            <div><dt>Reward price</dt><dd>R @Model.RewardPrice</dd></div>
+            <div><dt>Individual award</dt><dd>@Model.IndividualAward</dd></div>
+            <div><dt>Trophy / medal</dt><dd>@Model.TrophyMedal</dd></div>
+            <div><dt>Promotion</dt><dd>@Model.Promotion</dd></div>
+            <div><dt>Kit set</dt><dd>@Model.KitSet</dd></div>
+        </dl>
+
+        @if (Model.EntryId is not null)
+        {
+            <div class="notice">
+                <p><strong>Your club's request:</strong> @Model.RequestStatus</p>
+                <p class="help">Sent @(Model.RequestedAt?.ToString("dd MMM yyyy") ?? "—")@(Model.Outcome is null ? "" : $" · Outcome: {Model.Outcome}")@(Model.StageReached is null ? "" : $" · {Model.StageReached}")</p>
+            </div>
+        }
+        else if (canRequest)
+        {
+            <form asp-action="RequestToJoin" method="post" class="form-actions">
+                <input type="hidden" name="id" value="@Model.CompetitionId" />
+                <button type="submit" class="btn btn-primary">Request to join</button>
+                <a class="btn btn-ghost" asp-action="Index">Cancel</a>
+            </form>
+        }
+        else
+        {
+            <p class="help">No entry from your club for this competition.</p>
+        }
+    </section>
+</div>

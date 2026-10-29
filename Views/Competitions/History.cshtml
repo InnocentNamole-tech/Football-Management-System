@@ -1,0 +1,53 @@
+@model List<CompetitionEntryRow>
+@{
+    ViewData["Title"] = "Competition history";
+    ViewData["Description"] = "Every competition your club has requested or entered, with outcomes.";
+    ViewData["Crumb"] = "Competitions";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+}
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="card empty">
+        <p>Your club has no competition history yet.</p>
+        <p>Browse competitions and send a request to join.</p>
+        <a class="btn btn-primary" asp-action="Index">Browse competitions</a>
+    </div>
+}
+else
+{
+    <div class="table-wrap card">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>Competition</th>
+                    <th>Type</th>
+                    <th>Division</th>
+                    <th>Dates</th>
+                    <th>Requested</th>
+                    <th>Status</th>
+                    <th>Outcome</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in Model)
+                {
+                    <tr>
+                        <td><strong>@entry.CompetitionName</strong></td>
+                        <td>@entry.CompetitionType</td>
+                        <td>@entry.Gender @entry.AgeGroup</td>
+                        <td class="nowrap">@entry.StartDate.ToString("dd MMM yyyy") – @entry.EndDate.ToString("dd MMM yyyy")</td>
+                        <td>@entry.RequestedAt.ToString("dd MMM yyyy")</td>
+                        <td><span class="pill pill-muted">@entry.RequestStatus</span></td>
+                        <td>@(entry.Outcome ?? "—")@(entry.StageReached is null ? "" : $" · {entry.StageReached}")</td>
+                        <td class="text-right">
+                            <a class="btn btn-small" asp-action="Details" asp-route-id="@entry.CompetitionId">View</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

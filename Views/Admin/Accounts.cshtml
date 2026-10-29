@@ -1,0 +1,89 @@
+@model List<AccountRow>
+@{
+    ViewData["Title"] = "Accounts";
+    ViewData["Description"] = "Search every account on the platform, reset a password or unlock a locked user.";
+    ViewData["PrimaryText"] = "Create account";
+    ViewData["PrimaryUrl"] = Url.Action("Create", "Admin") ?? "/Admin/Create";
+
+    var search = ViewData["Search"] as string;
+    var currentPersonId = ViewData["CurrentPersonId"] as int? ?? 0;
+}
+
+<partial name="_PageHeader" />
+
+<form class="searchbar" asp-controller="Admin" asp-action="Accounts" method="get">
+    <label class="visually-hidden" for="search">Search accounts</label>
+    <input class="input" id="search" name="search" value="@search" placeholder="Search name, username, email or club" />
+    <button type="submit" class="btn btn-secondary">Search</button>
+    @if (!string.IsNullOrWhiteSpace(search))
+    {
+        <a class="btn btn-secondary" asp-controller="Admin" asp-action="Accounts">Clear</a>
+    }
+</form>
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No accounts found</h3>
+        <p>No account matches that search. Try a different name or username.</p>
+        <a class="btn btn-primary btn-small" asp-controller="Admin" asp-action="Create">Create an account</a>
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Club</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var account in Model)
+            {
+                <tr>
+                    <td><strong>@account.FullName</strong></td>
+                    <td>@account.Username</td>
+                    <td>@account.Email</td>
+                    <td>@(string.IsNullOrWhiteSpace(account.Role) ? "—" : account.Role)</td>
+                    <td>@(string.IsNullOrWhiteSpace(account.ClubName) ? "—" : account.ClubName)</td>
+                    <td>
+                        @if (account.IsLocked)
+                        {
+                            <span class="pill pill-rejected">Locked</span>
+                        }
+                        else
+                        {
+                            <span class="pill pill-active">Active</span>
+                        }
+                    </td>
+                    <td class="nowrap">@account.CreatedAt.ToString("dd MMM yyyy")</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-secondary btn-small" asp-controller="Admin" asp-action="ResetPassword" asp-route-id="@account.PersonId">Reset password</a>
+                            @if (account.IsLocked)
+                            {
+                                <form asp-controller="Admin" asp-action="Unlock" asp-route-id="@account.PersonId" method="post" class="inline-form">
+                                    <button type="submit" class="btn btn-gold btn-small">Unlock</button>
+                                </form>
+                            }
+                            @if (account.PersonId != currentPersonId)
+                            {
+                                <a class="btn btn-danger btn-small" asp-controller="Admin" asp-action="Delete" asp-route-id="@account.PersonId">Remove</a>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="table-note">@Model.Count account@(Model.Count == 1 ? "" : "s") shown. Locked accounts can be unlocked immediately.</p>
+}

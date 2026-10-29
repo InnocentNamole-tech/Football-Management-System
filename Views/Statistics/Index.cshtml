@@ -1,0 +1,54 @@
+@model List<MatchRow>
+@{
+    ViewData["Title"] = "Statistics";
+    ViewData["Description"] = "Choose a completed match to review or add player statistics.";
+    ViewData["PrimaryText"] = "Add statistics";
+    ViewData["PrimaryUrl"] = Url.Action("Add", "Statistics") ?? "/Statistics/Add";
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No completed matches</h3>
+        <p>Record a result first, then add the player statistics for that match.</p>
+        <a class="btn btn-primary btn-small" asp-controller="Matches" asp-action="Index">View matches</a>
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Opponent</th>
+                <th>Competition</th>
+                <th>Score</th>
+                <th>Outcome</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var match in Model)
+            {
+                <tr>
+                    <td class="nowrap">@match.MatchDate.ToString("dd MMM yyyy")</td>
+                    <td><strong>vs @match.Opponent</strong></td>
+                    <td>@(string.IsNullOrWhiteSpace(match.CompetitionName) ? "Friendly" : match.CompetitionName)</td>
+                    <td class="scoreline">@match.Scoreline</td>
+                    <td><span class="result @(match.Result == "Win" ? "result-win" : match.Result == "Loss" ? "result-loss" : "result-draw")">@match.Result</span></td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-secondary btn-small" asp-controller="Statistics" asp-action="View" asp-route-id="@match.MatchId">View statistics</a>
+                            <a class="btn btn-secondary btn-small" asp-controller="Statistics" asp-action="Add" asp-route-matchId="@match.MatchId">Add statistics</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="table-note">Statistics can only be added to completed matches. A player may have one stat line per match.</p>
+}

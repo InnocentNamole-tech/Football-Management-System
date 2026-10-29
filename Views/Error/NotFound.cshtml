@@ -1,0 +1,27 @@
+@{
+    ViewData["Title"] = "Page not found";
+    ViewData["Description"] = "The page you asked for does not exist or has moved.";
+}
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+    <span class="sep">/</span>
+    <span aria-current="page">@ViewData["Title"]</span>
+</nav>
+
+<div class="card fade-up text-center">
+    <p class="status-code">@ViewData["StatusCode"]</p>
+    <h1>That page is off the pitch</h1>
+    <p class="muted">The address may be mistyped, or the page may have been removed. Use the navigation above or head back to your dashboard.</p>
+    <div class="btn-row center-actions">
+        <a class="btn btn-primary" asp-controller="Dashboard" asp-action="Index">Back to dashboard</a>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a class="btn btn-secondary" asp-controller="Profile" asp-action="Index">View profile</a>
+        }
+        else
+        {
+            <a class="btn btn-secondary" asp-controller="Account" asp-action="Login">Sign in</a>
+        }
+    </div>
+</div>

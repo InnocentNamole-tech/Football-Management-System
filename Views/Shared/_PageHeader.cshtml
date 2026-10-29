@@ -1,0 +1,41 @@
+@{
+    var title = ViewData["Title"] as string ?? "Football Club Management";
+    var description = ViewData["Description"] as string;
+    var crumb = ViewData["Crumb"] as string;
+    var crumbUrl = ViewData["CrumbUrl"] as string;
+    var primaryText = ViewData["PrimaryText"] as string;
+    var primaryUrl = ViewData["PrimaryUrl"] as string;
+}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+    @if (!string.IsNullOrWhiteSpace(crumb))
+    {
+        <span class="sep">/</span>
+        @if (!string.IsNullOrWhiteSpace(crumbUrl))
+        {
+            <a href="@crumbUrl">@crumb</a>
+        }
+        else
+        {
+            <span>@crumb</span>
+        }
+    }
+    <span class="sep">/</span>
+    <span aria-current="page">@title</span>
+</nav>
+
+<div class="page-head">
+    <div>
+        <h1>@title</h1>
+        @if (!string.IsNullOrWhiteSpace(description))
+        {
+            <p>@description</p>
+        }
+    </div>
+    @if (!string.IsNullOrWhiteSpace(primaryText) && !string.IsNullOrWhiteSpace(primaryUrl))
+    {
+        <div class="page-actions">
+            <a class="btn btn-primary" href="@primaryUrl">@primaryText</a>
+        </div>
+    }
+</div>

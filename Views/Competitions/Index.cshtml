@@ -1,0 +1,191 @@
+@model CompetitionsIndexVm
+@{
+    ViewData["Title"] = "Competitions";
+    ViewData["Description"] = "Tournaments your club can enter, is entered in, or is running.";
+    if (Model.Role == RoleNames.Organiser)
+    {
+        ViewData["PrimaryText"] = "Create competition";
+        ViewData["PrimaryUrl"] = Url.Action("Create");
+    }
+    else if (Model.Role == RoleNames.Coordinator)
+    {
+        ViewData["PrimaryText"] = "Entry history";
+        ViewData["PrimaryUrl"] = Url.Action("History");
+    }
+}
+<partial name="_PageHeader" />
+
+@if (Model.Role == RoleNames.Admin)
+{
+    <div class="card empty">
+        <p>Competitions are run by organisers.</p>
+        <p>Organisers create and manage competitions from their own dashboard.</p>
+        <a class="btn btn-ghost" asp-controller="Dashboard" asp-action="Index">Back to dashboard</a>
+    </div>
+}
+else if (Model.Role == RoleNames.Organiser)
+{
+    <div class="card dash-list">
+        <div class="section-title">
+            <h2>Your competitions</h2>
+            <a class="btn btn-small" asp-action="Requests">Requests@(Model.PendingCount > 0 ? $" ({Model.PendingCount})" : "")</a>
+        </div>
+
+        @if (Model.Competitions.Count == 0)
+        {
+            <p class="help">You have not created a competition yet.</p>
+            <a class="btn btn-primary" asp-action="Create">Create competition</a>
+        }
+        else
+        {
+            <div class="table-wrap">
+                <table class="data">
+                    <thead>
+                        <tr>
+                            <th>Competition</th>
+                            <th>Type</th>
+                            <th>Division</th>
+                            <th>Dates</th>
+                            <th>Teams</th>
+                            <th>Status</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var comp in Model.Competitions)
+                        {
+                            <tr>
+                                <td><strong>@comp.CompetitionName</strong></td>
+                                <td>@comp.CompetitionType</td>
+                                <td>@comp.Gender @comp.AgeGroup</td>
+                                <td class="nowrap">@comp.StartDate.ToString("dd MMM yyyy") – @comp.EndDate.ToString("dd MMM yyyy")</td>
+                                <td>@comp.ApprovedCount / @comp.TeamCount</td>
+                                <td><span class="pill pill-muted">@comp.CompetitionStatus</span></td>
+                                <td class="nowrap text-right">
+                                    <a class="btn btn-small" asp-action="Details" asp-route-id="@comp.CompetitionId">View</a>
+                                    <a class="btn btn-small btn-ghost" asp-action="Edit" asp-route-id="@comp.CompetitionId">Edit</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-actions">
+                <a class="btn btn-ghost" asp-action="Outcomes">Record outcomes</a>
+            </div>
+        }
+    </div>
+}
+else
+{
+    @if (Model.Role == RoleNames.Coordinator)
+    {
+        <div class="card dash-list">
+            <div class="section-title">
+                <h2>Open to @Model.ClubName</h2>
+                <a class="btn btn-small" asp-action="History">Your entry history</a>
+            </div>
+            @if (Model.Competitions.Count == 0)
+            {
+                <p class="help">No competitions currently match your club's gender and age group.</p>
+            }
+            else
+            {
+                <div class="grid grid-3">
+                    @foreach (var comp in Model.Competitions)
+                    {
+                        var entry = Model.Entries.FirstOrDefault(e => e.CompetitionId == comp.CompetitionId);
+                        <article class="card">
+                            <h3>@comp.CompetitionName</h3>
+                            <p class="help">@comp.CompetitionType · @comp.Gender @comp.AgeGroup</p>
+                            <p>@comp.StartDate.ToString("dd MMM yyyy") – @comp.EndDate.ToString("dd MMM yyyy")</p>
+                            <p class="help">@comp.CityName · @comp.TeamCount teams</p>
+                            <footer class="form-actions">
+                                <a class="btn btn-small" asp-action="Details" asp-route-id="@comp.CompetitionId">View</a>
+                                @if (entry is null)
+                                {
+                                    <form asp-action="RequestToJoin" method="post">
+                                        <input type="hidden" name="id" value="@comp.CompetitionId" />
+                                        <button type="submit" class="btn btn-small btn-primary">Request to join</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="pill pill-muted">@entry.RequestStatus</span>
+                                }
+                            </footer>
+                        </article>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="card dash-list">
+            <div class="section-title">
+                <h2>Your entries</h2>
+            </div>
+            @if (Model.Entries.Count == 0)
+            {
+                <p class="help">Your club has not entered a competition yet.</p>
+            }
+            else
+            {
+                <div class="table-wrap">
+                    <table class="data">
+                        <thead>
+                            <tr>
+                                <th>Competition</th>
+                                <th>Type</th>
+                                <th>Requested</th>
+                                <th>Status</th>
+                                <th>Outcome</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var entry in Model.Entries)
+                            {
+                                <tr>
+                                    <td><strong>@entry.CompetitionName</strong></td>
+                                    <td>@entry.CompetitionType</td>
+                                    <td>@entry.RequestedAt.ToString("dd MMM yyyy")</td>
+                                    <td><span class="pill pill-muted">@entry.RequestStatus</span></td>
+                                    <td>@(entry.Outcome ?? "—")@(entry.StageReached is null ? "" : $" · {entry.StageReached}")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="card dash-list">
+            <div class="section-title">
+                <h2>@(Model.Role == RoleNames.Coach ? "Competitions your club is in" : "Competitions")</h2>
+            </div>
+            @if (Model.Entries.Count == 0)
+            {
+                <p class="help">No approved competition entries yet.</p>
+            }
+            else
+            {
+                <div class="grid grid-3">
+                    @foreach (var entry in Model.Entries)
+                    {
+                        <article class="card">
+                            <h3>@entry.CompetitionName</h3>
+                            <p class="help">@entry.CompetitionType · @entry.Gender @entry.AgeGroup</p>
+                            <p>@entry.StartDate.ToString("dd MMM yyyy") – @entry.EndDate.ToString("dd MMM yyyy")</p>
+                            <p class="help">@entry.StadiumName, @entry.CityName</p>
+                            <footer class="form-actions">
+                                <a class="btn btn-small" asp-action="Details" asp-route-id="@entry.CompetitionId">View</a>
+                                <span class="pill pill-muted">@entry.CompetitionStatus</span>
+                            </footer>
+                        </article>
+                    }
+                </div>
+            }
+        </div>
+    }
+}

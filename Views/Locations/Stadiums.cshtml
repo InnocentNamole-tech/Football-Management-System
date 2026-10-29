@@ -1,0 +1,52 @@
+@model List<StadiumRow>
+@{
+    ViewData["Title"] = "Stadiums";
+    ViewData["Description"] = "Every stadium on the platform, the city it sits in and its playing surface.";
+    ViewData["PrimaryText"] = "Add stadium";
+    ViewData["PrimaryUrl"] = Url.Action("CreateStadium");
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No stadiums yet</h3>
+        <p>Add a stadium to give a city a home ground for matches and clubs.</p>
+        <a class="btn btn-primary btn-small" asp-action="CreateStadium">Add the first stadium</a>
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>Stadium</th>
+                    <th>City</th>
+                    <th>Province</th>
+                    <th>Surface</th>
+                    <th>Capacity</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var stadium in Model)
+                {
+                    <tr>
+                        <td><strong>@stadium.StadiumName</strong></td>
+                        <td>@stadium.CityName</td>
+                        <td>@stadium.ProvinceName</td>
+                        <td>@stadium.Surface</td>
+                        <td>@stadium.Capacity.ToString("N0")</td>
+                        <td class="nowrap text-right">
+                            <a class="btn btn-secondary btn-small" asp-action="Stadium" asp-route-id="@stadium.StadiumId">View</a>
+                            <a class="btn btn-secondary btn-small" asp-action="EditStadium" asp-route-id="@stadium.StadiumId">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="table-note">@Model.Count stadium@(Model.Count == 1 ? "" : "s") on record.</p>
+}

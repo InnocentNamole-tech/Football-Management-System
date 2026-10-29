@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Something went wrong";
+    ViewData["Description"] = "The club system hit an unexpected problem.";
+}
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+    <span class="sep">/</span>
+    <span aria-current="page">@ViewData["Title"]</span>
+</nav>
+
+<div class="card fade-up text-center">
+    <p class="status-code">500</p>
+    <h1>The whistle went early</h1>
+    <p class="muted">An unexpected error stopped that request. Nothing was left half-saved. Try the page again, or go back to your dashboard.</p>
+    <div class="btn-row center-actions">
+        <a class="btn btn-primary" asp-controller="Dashboard" asp-action="Index">Back to dashboard</a>
+        @if (User.Identity?.IsAuthenticated != true)
+        {
+            <a class="btn btn-secondary" asp-controller="Account" asp-action="Login">Sign in</a>
+        }
+    </div>
+</div>

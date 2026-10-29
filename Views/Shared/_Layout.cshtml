@@ -1,0 +1,236 @@
+@using System.Security.Claims
+@{
+    var role = User.FindFirstValue(ClaimTypes.Role) ?? "";
+    var displayName = User.FindFirstValue("FullName") ?? User.Identity?.Name ?? "";
+    var authenticated = User.Identity?.IsAuthenticated == true;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Football Club Management</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+@if (authenticated)
+{
+    <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-label="Toggle navigation menu" />
+}
+
+<header class="site-header">
+    <div class="header-inner">
+        @if (authenticated)
+        {
+            <label for="menu-toggle" class="nav-burger" aria-label="Open menu" role="button" tabindex="-1">
+                <span></span><span></span><span></span>
+            </label>
+        }
+        <a class="brand" asp-controller="@(authenticated ? "Dashboard" : "Home")" asp-action="Index">
+            <span class="brand-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z" />
+                    <path d="M12 7l3 2-1 3.5h-4L9 9l3-2z" />
+                    <path d="M12 7V3M15 9l4-1M14 12.5l2.5 3M10 12.5L7.5 15.5M9 9L5 8" />
+                </svg>
+            </span>
+            <span class="brand-text">Football Club<span class="brand-sub">Management</span></span>
+        </a>
+
+        @if (authenticated)
+        {
+            <div class="header-tools">
+                <span class="header-user">
+                    <span class="user-name">@displayName</span>
+                    <span class="role-badge">@role</span>
+                </span>
+            </div>
+        }
+        else
+        {
+            <div class="public-actions">
+                <a class="btn btn-secondary btn-small" asp-controller="Account" asp-action="Login">Log in</a>
+                <a class="btn btn-gold btn-small" asp-controller="Account" asp-action="Register">Sign up</a>
+            </div>
+        }
+    </div>
+</header>
+
+@if (authenticated)
+{
+    <label class="drawer-scrim" for="menu-toggle" aria-hidden="true"></label>
+
+    <aside class="sidemenu" id="side-menu" aria-label="Main navigation">
+        <div class="sidemenu-head">
+            <div class="sidemenu-user">
+                <span class="sidemenu-avatar">@(string.IsNullOrWhiteSpace(displayName) ? "?" : displayName[..1].ToUpperInvariant())</span>
+                <span>
+                    <strong>@displayName</strong>
+                    <small>@role</small>
+                </span>
+            </div>
+            <label for="menu-toggle" class="drawer-close" aria-label="Close menu" role="button" tabindex="-1">&#215;</label>
+        </div>
+
+        <nav class="sidenav">
+            <a class="side-link side-home" asp-controller="Dashboard" asp-action="Index">
+                <partial name="_MenuIcon" model="@("home")" /> Dashboard
+            </a>
+
+            @if (role == "Admin")
+            {
+                <div class="side-group">
+                    <h2>Accounts</h2>
+                    <a asp-controller="Admin" asp-action="Create"><partial name="_MenuIcon" model="@("create")" /> Create account</a>
+                    <a asp-controller="Admin" asp-action="Accounts"><partial name="_MenuIcon" model="@("view")" /> View accounts</a>
+                </div>
+                <div class="side-group">
+                    <h2>Clubs</h2>
+                    <a asp-controller="Clubs" asp-action="Create"><partial name="_MenuIcon" model="@("create")" /> Register club</a>
+                    <a asp-controller="Clubs" asp-action="Index"><partial name="_MenuIcon" model="@("view")" /> View clubs</a>
+                </div>
+            }
+            else if (role == "Organiser")
+            {
+                <div class="side-group">
+                    <h2>Competitions</h2>
+                    <a asp-controller="Competitions" asp-action="Create"><partial name="_MenuIcon" model="@("create")" /> Create competition</a>
+                    <a asp-controller="Competitions" asp-action="Index"><partial name="_MenuIcon" model="@("view")" /> View competitions</a>
+                    <a asp-controller="Competitions" asp-action="Requests"><partial name="_MenuIcon" model="@("check")" /> Manage requests</a>
+                    <a asp-controller="Competitions" asp-action="Outcomes"><partial name="_MenuIcon" model="@("trophy")" /> Record outcomes</a>
+                </div>
+            }
+            else if (role == "Coordinator")
+            {
+                <a class="side-link" asp-controller="Clubs" asp-action="MyClub"><partial name="_MenuIcon" model="@("shield")" /> My club</a>
+                <div class="side-group">
+                    <h2>People</h2>
+                    <a asp-controller="Players" asp-action="Create"><partial name="_MenuIcon" model="@("create")" /> Register player</a>
+                    <a asp-controller="Players" asp-action="Index"><partial name="_MenuIcon" model="@("users")" /> View players</a>
+                    <a asp-controller="Coaches" asp-action="Create"><partial name="_MenuIcon" model="@("create")" /> Register coach</a>
+                    <a asp-controller="Coaches" asp-action="Index"><partial name="_MenuIcon" model="@("view")" /> View coaches</a>
+                </div>
+                <div class="side-group">
+                    <h2>Matches</h2>
+                    <a asp-controller="Matches" asp-action="Create"><partial name="_MenuIcon" model="@("create")" /> Create match</a>
+                    <a asp-controller="Matches" asp-action="Index"><partial name="_MenuIcon" model="@("view")" /> View matches</a>
+                    <a asp-controller="Squads" asp-action="Index"><partial name="_MenuIcon" model="@("clipboard")" /> View squads</a>
+                    <a asp-controller="Comments" asp-action="Index"><partial name="_MenuIcon" model="@("comment")" /> View comments</a>
+                </div>
+                <div class="side-group">
+                    <h2>Statistics</h2>
+                    <a asp-controller="Statistics" asp-action="Add"><partial name="_MenuIcon" model="@("create")" /> Add statistics</a>
+                    <a asp-controller="Statistics" asp-action="Index"><partial name="_MenuIcon" model="@("chart")" /> View statistics</a>
+                    <a asp-controller="Statistics" asp-action="Leaderboards"><partial name="_MenuIcon" model="@("chart")" /> Leaderboards</a>
+                </div>
+                <div class="side-group">
+                    <h2>Club administration</h2>
+                    <a asp-controller="Injuries" asp-action="Record"><partial name="_MenuIcon" model="@("pulse")" /> Record injury</a>
+                    <a asp-controller="Injuries" asp-action="Index"><partial name="_MenuIcon" model="@("pulse")" /> View injuries</a>
+                    <a asp-controller="Announcements" asp-action="Create"><partial name="_MenuIcon" model="@("create")" /> Post announcement</a>
+                    <a asp-controller="Announcements" asp-action="Index"><partial name="_MenuIcon" model="@("bell")" /> View announcements</a>
+                    <a asp-controller="TeamHistory" asp-action="Index"><partial name="_MenuIcon" model="@("clock")" /> Team history</a>
+                </div>
+                <div class="side-group">
+                    <h2>Locations</h2>
+                    <a asp-controller="Locations" asp-action="Cities"><partial name="_MenuIcon" model="@("pin")" /> Cities</a>
+                    <a asp-controller="Locations" asp-action="Stadiums"><partial name="_MenuIcon" model="@("stadium")" /> Stadiums</a>
+                </div>
+                <div class="side-group">
+                    <h2>Competitions</h2>
+                    <a asp-controller="Competitions" asp-action="Index"><partial name="_MenuIcon" model="@("trophy")" /> View competitions</a>
+                    <a asp-controller="Competitions" asp-action="History"><partial name="_MenuIcon" model="@("clipboard")" /> My requests</a>
+                </div>
+            }
+            else if (role == "Coach")
+            {
+                <a class="side-link" asp-controller="Clubs" asp-action="MyClub"><partial name="_MenuIcon" model="@("shield")" /> My club</a>
+                <div class="side-group">
+                    <h2>Squads</h2>
+                    <a asp-controller="Squads" asp-action="Select"><partial name="_MenuIcon" model="@("create")" /> Select squad</a>
+                    <a asp-controller="Squads" asp-action="Index"><partial name="_MenuIcon" model="@("view")" /> View squads</a>
+                </div>
+                <div class="side-group">
+                    <h2>Club</h2>
+                    <a asp-controller="Competitions" asp-action="Index"><partial name="_MenuIcon" model="@("trophy")" /> Competitions</a>
+                    <a asp-controller="Players" asp-action="Index"><partial name="_MenuIcon" model="@("users")" /> View players</a>
+                    <a asp-controller="Injuries" asp-action="Index"><partial name="_MenuIcon" model="@("pulse")" /> View injuries</a>
+                    <a asp-controller="Unavailabilities" asp-action="Club"><partial name="_MenuIcon" model="@("calendar")" /> View unavailabilities</a>
+                    <a asp-controller="Comments" asp-action="Index"><partial name="_MenuIcon" model="@("comment")" /> View comments</a>
+                    <a asp-controller="TeamHistory" asp-action="Index"><partial name="_MenuIcon" model="@("clock")" /> Club history</a>
+                </div>
+            }
+            else if (role == "Player")
+            {
+                <a class="side-link" asp-controller="Clubs" asp-action="MyClub"><partial name="_MenuIcon" model="@("shield")" /> My club</a>
+                <div class="side-group">
+                    <h2>My season</h2>
+                    <a asp-controller="Statistics" asp-action="Mine"><partial name="_MenuIcon" model="@("chart")" /> My statistics</a>
+                    <a asp-controller="Injuries" asp-action="Index"><partial name="_MenuIcon" model="@("pulse")" /> My injuries</a>
+                    <a asp-controller="Unavailabilities" asp-action="Create"><partial name="_MenuIcon" model="@("create")" /> Add unavailability</a>
+                    <a asp-controller="Unavailabilities" asp-action="Index"><partial name="_MenuIcon" model="@("view")" /> View mine</a>
+                    <a asp-controller="TeamHistory" asp-action="Index"><partial name="_MenuIcon" model="@("clock")" /> Club history</a>
+                </div>
+                <div class="side-group">
+                    <h2>Matchday</h2>
+                    <a asp-controller="Matches" asp-action="Fixtures"><partial name="_MenuIcon" model="@("calendar")" /> Fixtures</a>
+                    <a asp-controller="Matches" asp-action="Results"><partial name="_MenuIcon" model="@("flag")" /> Results</a>
+                    <a asp-controller="Squads" asp-action="Index"><partial name="_MenuIcon" model="@("clipboard")" /> Squads</a>
+                    <a asp-controller="Comments" asp-action="Index"><partial name="_MenuIcon" model="@("comment")" /> View comments</a>
+                </div>
+            }
+            else if (role == "Fan")
+            {
+                <a class="side-link" asp-controller="Clubs" asp-action="MyClub"><partial name="_MenuIcon" model="@("shield")" /> My club</a>
+                <div class="side-group">
+                    <h2>Matchday</h2>
+                    <a asp-controller="Matches" asp-action="Fixtures"><partial name="_MenuIcon" model="@("calendar")" /> Fixtures</a>
+                    <a asp-controller="Matches" asp-action="Results"><partial name="_MenuIcon" model="@("flag")" /> Results</a>
+                    <a asp-controller="Squads" asp-action="Index"><partial name="_MenuIcon" model="@("clipboard")" /> Squads</a>
+                </div>
+                <div class="side-group">
+                    <h2>Club life</h2>
+                    <a asp-controller="Comments" asp-action="Create"><partial name="_MenuIcon" model="@("create")" /> Add comment</a>
+                    <a asp-controller="Comments" asp-action="Index"><partial name="_MenuIcon" model="@("comment")" /> View comments</a>
+                    <a asp-controller="Announcements" asp-action="Index"><partial name="_MenuIcon" model="@("bell")" /> Announcements</a>
+                    <a asp-controller="TeamHistory" asp-action="Index"><partial name="_MenuIcon" model="@("clock")" /> Club history</a>
+                    <a asp-controller="Competitions" asp-action="Index"><partial name="_MenuIcon" model="@("trophy")" /> Competitions</a>
+                </div>
+            }
+
+            <div class="side-group">
+                <h2>Account</h2>
+                <a asp-controller="Profile" asp-action="Index"><partial name="_MenuIcon" model="@("user")" /> View profile</a>
+                <a asp-controller="Profile" asp-action="Edit"><partial name="_MenuIcon" model="@("edit")" /> Edit profile</a>
+            </div>
+        </nav>
+
+        <div class="sidemenu-foot">
+            <form class="logout-form" asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit" class="btn btn-secondary btn-small btn-block">Log out</button>
+            </form>
+        </div>
+    </aside>
+}
+
+<main class="site-main" id="main">
+    @if (TempData["Success"] is string success && !string.IsNullOrWhiteSpace(success))
+    {
+        <div class="alert alert-success" role="status">@success</div>
+    }
+    @if (TempData["Error"] is string error && !string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert alert-error" role="alert">@error</div>
+    }
+    @RenderBody()
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <span>Football Club Management System</span>
+    </div>
+</footer>
+</body>
+</html>

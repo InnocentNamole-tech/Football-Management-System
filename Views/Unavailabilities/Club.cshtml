@@ -1,0 +1,46 @@
+@model List<UnavailabilityRow>
+@{
+    ViewData["Title"] = "Player unavailability";
+    ViewData["Description"] = "Dates players have declared themselves unavailable for selection.";
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>Everyone is available</h3>
+        <p>No player has reported an unavailability. New declarations will appear here.</p>
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Player</th>
+                <th>#</th>
+                <th>Reason</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Days</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><strong>@item.PlayerName</strong></td>
+                    <td>@item.JerseyNumber</td>
+                    <td>@item.Reason</td>
+                    <td class="nowrap">@item.StartDate.ToString("dd MMM yyyy")</td>
+                    <td class="nowrap">@item.EndDate.ToString("dd MMM yyyy")</td>
+                    <td>@((item.EndDate - item.StartDate).Days + 1)</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="table-note">Use this list before selecting a matchday squad.</p>
+}

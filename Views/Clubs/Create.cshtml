@@ -1,0 +1,93 @@
+@model ClubCreateVm
+@{
+    ViewData["Title"] = "Register club";
+    ViewData["Description"] = "Add a new club, its colours of identity and its home ground. Coaches, players and fans can then be linked to it.";
+    ViewData["Crumb"] = "Clubs";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Clubs");
+
+    var cities = ViewBag.Cities as List<CityRow> ?? new List<CityRow>();
+    var stadiums = ViewBag.Stadiums as List<StadiumRow> ?? new List<StadiumRow>();
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <form asp-controller="Clubs" asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+
+        <h2>Club details</h2>
+        <div class="form-grid">
+            <div class="form-group span-2">
+                <label asp-for="ClubName">Club name <span class="req">*</span></label>
+                <input asp-for="ClubName" class="input" autocomplete="organization" />
+                <span asp-validation-for="ClubName" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FoundedYear">Founded year <span class="req">*</span></label>
+                <input asp-for="FoundedYear" class="input" type="number" min="1850" max="2100" />
+                <span asp-validation-for="FoundedYear" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Gender">Gender group <span class="req">*</span></label>
+                <select asp-for="Gender" class="input">
+                    <option value="">Choose a group</option>
+                    @foreach (var gender in ClubLookups.Genders)
+                    {
+                        <option value="@gender">@gender</option>
+                    }
+                </select>
+                <span asp-validation-for="Gender" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AgeGroup">Age group <span class="req">*</span></label>
+                <select asp-for="AgeGroup" class="input">
+                    <option value="">Choose an age group</option>
+                    @foreach (var group in ClubLookups.AgeGroups)
+                    {
+                        <option value="@group">@group</option>
+                    }
+                </select>
+                <span asp-validation-for="AgeGroup" class="field-error"></span>
+            </div>
+        </div>
+
+        <h2 class="section-title">Home ground</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="CityId">Home city <span class="req">*</span></label>
+                <select asp-for="CityId" class="input">
+                    <option value="">Choose a city</option>
+                    @foreach (var city in cities)
+                    {
+                        <option value="@city.CityId">@city.CityName · @city.ProvinceName</option>
+                    }
+                </select>
+                <span asp-validation-for="CityId" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StadiumId">Home stadium <span class="req">*</span></label>
+                <select asp-for="StadiumId" class="input">
+                    <option value="">Choose a stadium</option>
+                    @foreach (var stadium in stadiums)
+                    {
+                        <option value="@stadium.StadiumId">@stadium.StadiumName · @stadium.CityName</option>
+                    }
+                </select>
+                <span class="help">The stadium must sit in the club's home city.</span>
+                <span asp-validation-for="StadiumId" class="field-error"></span>
+            </div>
+        </div>
+
+        @if (cities.Count == 0 || stadiums.Count == 0)
+        {
+            <div class="notice mt-2">
+                A city and a stadium must exist before a club can be registered. Club coordinators can add cities and stadiums from the Locations menu.
+            </div>
+        }
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Register club</button>
+            <a class="btn btn-secondary" asp-controller="Clubs" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

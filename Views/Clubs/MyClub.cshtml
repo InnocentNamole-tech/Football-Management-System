@@ -1,0 +1,80 @@
+@model ClubOverview
+@{
+    var club = Model.Club;
+    ViewData["Title"] = club.ClubName;
+    ViewData["Description"] = "Your club at a glance: people, ground and season totals.";
+    ViewData["Crumb"] = "My club";
+}
+
+<partial name="_PageHeader" />
+
+<div class="stat-grid mb-1">
+    <div class="stat">
+        <div class="value">@Model.TotalPlayers</div>
+        <div class="label">Total players</div>
+    </div>
+    <div class="stat">
+        <div class="value">@Model.MatchesPlayed</div>
+        <div class="label">Matches played</div>
+    </div>
+    <div class="stat">
+        <div class="value">@Model.Wins</div>
+        <div class="label">Total wins</div>
+    </div>
+</div>
+
+<div class="grid grid-2 mt-2">
+    <section class="card">
+        <div class="card-head">
+            <h2>Club profile</h2>
+            <span class="pill pill-gold">@club.AgeGroup @club.Gender</span>
+        </div>
+        <dl class="kv">
+            <dt>Club name</dt>
+            <dd>@club.ClubName</dd>
+            <dt>Year founded</dt>
+            <dd>@club.FoundedYear</dd>
+            <dt>Home stadium</dt>
+            <dd>@club.StadiumName</dd>
+            <dt>City based</dt>
+            <dd>@club.CityName, @club.ProvinceName</dd>
+            <dt>Age group</dt>
+            <dd>@club.AgeGroup</dd>
+            <dt>Gender group</dt>
+            <dd>@club.Gender</dd>
+        </dl>
+    </section>
+
+    <section class="card">
+        <div class="card-head"><h2>Club staff</h2></div>
+        <dl class="kv">
+            <dt>Coach</dt>
+            <dd>
+                @(string.IsNullOrWhiteSpace(Model.CoachName) ? "Not assigned" : Model.CoachName)
+                @if (!string.IsNullOrWhiteSpace(Model.CoachLicense))
+                {
+                    <span class="pill pill-neutral">@Model.CoachLicense</span>
+                }
+            </dd>
+            <dt>Coordinator</dt>
+            <dd>@(string.IsNullOrWhiteSpace(Model.CoordinatorName) ? "Not assigned" : Model.CoordinatorName)</dd>
+            <dt>Home ground</dt>
+            <dd>@club.StadiumName (@club.Capacity.ToString("N0") seats)</dd>
+        </dl>
+
+        <div class="form-actions">
+            @if (User.IsInRole(RoleNames.Coordinator))
+            {
+                <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Index">All matches</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Squads" asp-action="Index">View squads</a>
+            }
+            else
+            {
+                <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Fixtures">Fixtures</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Results">Results</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Squads" asp-action="Index">Squads</a>
+            }
+            <a class="btn btn-secondary btn-small" asp-controller="Clubs" asp-action="Details" asp-route-id="@club.ClubId">Full club page</a>
+        </div>
+    </section>
+</div>

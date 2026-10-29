@@ -1,0 +1,38 @@
+@model PlayerOverview
+@{
+    ViewData["Title"] = "Deactivate player";
+    ViewData["Description"] = "Confirm that this player should leave the active squad.";
+    ViewData["Crumb"] = "Players";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Players");
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <div class="alert alert-error" role="alert">
+        Deactivating <strong>@Model.FullName</strong> ends their active membership and releases jersey number <strong>@Model.JerseyNumber</strong>.
+        Their history, statistics and login are kept.
+    </div>
+
+    <dl class="kv">
+        <dt>Player</dt>
+        <dd>@Model.FullName</dd>
+        <dt>Club</dt>
+        <dd>@Model.ClubName</dd>
+        <dt>Position</dt>
+        <dd>@Model.PositionName</dd>
+        <dt>Jersey number</dt>
+        <dd>@Model.JerseyNumber</dd>
+        <dt>Nickname</dt>
+        <dd>@Model.Nickname</dd>
+    </dl>
+
+    <p class="muted small mt-2">This action cannot be undone from this screen. A coordinator can re-register the player if they return.</p>
+
+    <form asp-controller="Players" asp-action="DeactivateConfirm" asp-route-id="@Model.PlayerId" method="post">
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Yes, deactivate player</button>
+            <a class="btn btn-secondary" asp-controller="Players" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

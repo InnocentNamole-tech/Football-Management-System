@@ -1,0 +1,17 @@
+# Build output
+bin/
+obj/
+Output-Debug.txt
+
+# Visual Studio / IDE
+.vs/
+*.user
+*.suo
+
+# Runtime uploads (user photos are generated at run time)
+wwwroot/uploads/*
+!wwwroot/uploads/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,72 @@
+@model CityRow
+@{
+    ViewData["Title"] = Model.CityName;
+    ViewData["Description"] = "City profile, its province and the stadiums based there.";
+    ViewData["Crumb"] = "Cities";
+    ViewData["CrumbUrl"] = Url.Action("Cities");
+
+    var stadiums = ViewBag.Stadiums as List<StadiumRow> ?? new List<StadiumRow>();
+}
+
+<partial name="_PageHeader" />
+
+<div class="grid grid-2">
+    <section class="card">
+        <div class="card-head"><h2>City details</h2></div>
+        <dl class="kv">
+            <dt>City</dt>
+            <dd>@Model.CityName</dd>
+            <dt>Province</dt>
+            <dd>@Model.ProvinceName</dd>
+            <dt>Stadiums</dt>
+            <dd>@Model.StadiumCount</dd>
+            <dt>Clubs</dt>
+            <dd>@Model.ClubCount</dd>
+        </dl>
+        <div class="form-actions">
+            <a class="btn btn-secondary btn-small" asp-action="EditCity" asp-route-id="@Model.CityId">Edit city</a>
+            <a class="btn btn-secondary btn-small" asp-action="CreateStadium" asp-route-cityId="@Model.CityId">Add stadium here</a>
+            <a class="btn btn-secondary btn-small" asp-action="Cities">Back to cities</a>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="card-head">
+            <h2>Stadiums</h2>
+            <a asp-action="Stadiums">All stadiums</a>
+        </div>
+        @if (stadiums.Count == 0)
+        {
+            <p class="help">No stadiums in this city yet.</p>
+            <a class="btn btn-primary btn-small" asp-action="CreateStadium" asp-route-cityId="@Model.CityId">Add the first stadium</a>
+        }
+        else
+        {
+            <div class="table-wrap">
+                <table class="data">
+                    <thead>
+                        <tr>
+                            <th>Stadium</th>
+                            <th>Surface</th>
+                            <th>Capacity</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var stadium in stadiums)
+                        {
+                            <tr>
+                                <td><strong>@stadium.StadiumName</strong></td>
+                                <td>@stadium.Surface</td>
+                                <td>@stadium.Capacity.ToString("N0")</td>
+                                <td class="text-right">
+                                    <a class="btn btn-secondary btn-small" asp-action="Stadium" asp-route-id="@stadium.StadiumId">View</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+</div>

@@ -1,0 +1,32 @@
+@model AnnouncementRow
+@{
+    ViewData["Title"] = "Delete announcement";
+    ViewData["Description"] = "Confirm that this notice should be removed from the club feed.";
+    ViewData["Crumb"] = "Announcements";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+}
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <div class="alert alert-error" role="alert">
+        Deleting <strong>@Model.Title</strong> removes it from the club feed permanently.
+    </div>
+
+    <dl class="kv">
+        <dt>Title</dt>
+        <dd>@Model.Title</dd>
+        <dt>Posted</dt>
+        <dd>@Model.DatePosted.ToString("dd MMM yyyy")</dd>
+        <dt>Author</dt>
+        <dd>@Model.AuthorName</dd>
+        <dt>Description</dt>
+        <dd>@Model.Description</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed" asp-route-id="@Model.AnnouncementId" method="post">
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Yes, delete announcement</button>
+            <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

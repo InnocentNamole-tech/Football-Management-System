@@ -1,0 +1,82 @@
+@model RegisterVm
+@{
+    var role = ViewBag.Role as string ?? RoleNames.Fan;
+    var clubs = ViewBag.Clubs as List<ClubRow> ?? new List<ClubRow>();
+    var isFan = role == RoleNames.Fan;
+    var action = isFan ? "RegisterFan" : "RegisterOrganiser";
+    ViewData["Description"] = isFan
+        ? "Create a fan account and choose the club you follow."
+        : "Create a competition organiser account.";
+}
+
+<div class="auth-page auth-page-center fade-up">
+    <div class="card form-card auth-form-wide">
+        <span class="eyebrow">@(isFan ? "Club fan" : "Competition organiser")</span>
+        <h1>@ViewData["Title"]</h1>
+        <p class="muted small">Choose your own password. You will use your username and password to sign in.</p>
+
+        <form asp-controller="Account" asp-action="@action" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label asp-for="FirstName">First name <span class="req">*</span></label>
+                    <input asp-for="FirstName" class="input" autocomplete="given-name" />
+                    <span asp-validation-for="FirstName" class="field-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="LastName">Last name <span class="req">*</span></label>
+                    <input asp-for="LastName" class="input" autocomplete="family-name" />
+                    <span asp-validation-for="LastName" class="field-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email">Email <span class="req">*</span></label>
+                    <input asp-for="Email" class="input" type="email" autocomplete="email" />
+                    <span asp-validation-for="Email" class="field-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Username">Username <span class="req">*</span></label>
+                    <input asp-for="Username" class="input" autocomplete="username" />
+                    <span class="help">4 to 20 letters, digits or underscores.</span>
+                    <span asp-validation-for="Username" class="field-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Phone">Phone <span class="req">*</span></label>
+                    <input asp-for="Phone" class="input" type="tel" maxlength="10" autocomplete="tel" />
+                    <span class="help">10 digits, starting with 0.</span>
+                    <span asp-validation-for="Phone" class="field-error"></span>
+                </div>
+                @if (isFan)
+                {
+                    <div class="form-group">
+                        <label asp-for="ClubId">Club you support <span class="req">*</span></label>
+                        <select asp-for="ClubId" class="input">
+                            <option value="">Choose a club</option>
+                            @foreach (var club in clubs)
+                            {
+                                <option value="@club.ClubId">@club.ClubName · @club.AgeGroup @club.Gender</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ClubId" class="field-error"></span>
+                    </div>
+                }
+                <div class="form-group">
+                    <label asp-for="Password">Password <span class="req">*</span></label>
+                    <input asp-for="Password" class="input" autocomplete="new-password" />
+                    <span class="help">At least 8 characters with upper case, lower case, a digit and a special character.</span>
+                    <span asp-validation-for="Password" class="field-error"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword">Confirm password <span class="req">*</span></label>
+                    <input asp-for="ConfirmPassword" class="input" autocomplete="new-password" />
+                    <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create @(isFan ? "fan" : "organiser") account</button>
+                <a class="btn btn-secondary" asp-controller="Account" asp-action="Register">Back</a>
+            </div>
+        </form>
+    </div>
+</div>

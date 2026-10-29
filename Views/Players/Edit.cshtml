@@ -1,0 +1,86 @@
+@model PlayerEditVm
+@{
+    ViewData["Title"] = "Edit player";
+    ViewData["Description"] = "Update this player's contact details, position, style or jersey number.";
+    ViewData["Crumb"] = "Players";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Players");
+
+    var cities = ViewBag.Cities as SelectList;
+    var positions = ViewBag.Positions as SelectList;
+    var styles = ViewBag.Styles as SelectList;
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <p class="notice mb-1">Editing <strong>@Model.FirstName @Model.LastName</strong> (@Model.Username) at <strong>@Model.ClubName</strong>.</p>
+
+    <form asp-controller="Players" asp-action="Edit" method="post">
+        <input type="hidden" asp-for="PlayerId" />
+        <input type="hidden" asp-for="PersonId" />
+        <input type="hidden" asp-for="Username" />
+        <input type="hidden" asp-for="ClubName" />
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="FirstName">First name <span class="req">*</span></label>
+                <input asp-for="FirstName" class="input" />
+                <span asp-validation-for="FirstName" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName">Last name <span class="req">*</span></label>
+                <input asp-for="LastName" class="input" />
+                <span asp-validation-for="LastName" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email">Email <span class="req">*</span></label>
+                <input asp-for="Email" class="input" type="email" />
+                <span asp-validation-for="Email" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone">Phone <span class="req">*</span></label>
+                <input asp-for="Phone" class="input" type="tel" maxlength="10" />
+                <span asp-validation-for="Phone" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Nickname">Nickname <span class="req">*</span></label>
+                <input asp-for="Nickname" class="input" />
+                <span asp-validation-for="Nickname" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="JerseyNumber">Jersey number <span class="req">*</span></label>
+                <input asp-for="JerseyNumber" class="input" type="number" min="1" max="99" />
+                <span class="help">1 to 99, unique among active players in the club.</span>
+                <span asp-validation-for="JerseyNumber" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PositionId">Position <span class="req">*</span></label>
+                <select asp-for="PositionId" class="input" asp-items="positions">
+                    <option value="">Choose a position</option>
+                </select>
+                <span asp-validation-for="PositionId" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CityId">City <span class="req">*</span></label>
+                <select asp-for="CityId" class="input" asp-items="cities">
+                    <option value="">Choose a city</option>
+                </select>
+                <span asp-validation-for="CityId" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlayerStyleId">Player style</label>
+                <select asp-for="PlayerStyleId" class="input" asp-items="styles">
+                    <option value="">Choose a style</option>
+                </select>
+                <span asp-validation-for="PlayerStyleId" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save changes</button>
+            <a class="btn btn-secondary" asp-controller="Players" asp-action="Details" asp-route-id="@Model.PlayerId">Cancel</a>
+        </div>
+    </form>
+</div>

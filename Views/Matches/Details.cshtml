@@ -1,0 +1,96 @@
+@model MatchRow
+@{
+    var canEdit = ViewBag.CanEdit is true;
+    var canManageSquad = ViewBag.CanManageSquad is true;
+    ViewData["Title"] = $"vs {Model.Opponent}";
+    ViewData["Description"] = "Match details, venue, scoreline and squad status.";
+    ViewData["Crumb"] = "Matches";
+    ViewData["CrumbUrl"] = Url.Action(canEdit ? "Index" : "Fixtures", "Matches");
+
+    if (canEdit)
+    {
+        ViewData["PrimaryText"] = "Edit result";
+        ViewData["PrimaryUrl"] = Url.Action("EditResult", "Matches", new { id = Model.MatchId }) ?? "/Matches";
+    }
+}
+
+<partial name="_PageHeader" />
+
+<div class="grid grid-2">
+    <div class="card">
+        <div class="card-head">
+            <h2>Match details</h2>
+            @if (Model.Result is null)
+            {
+                <span class="pill pill-neutral">Awaiting result</span>
+            }
+            else
+            {
+                <span class="pill @(Model.Result == "Win" ? "pill-approved" : Model.Result == "Loss" ? "pill-rejected" : "pill-neutral")">@Model.Result</span>
+            }
+        </div>
+        <dl class="kv">
+            <dt>Club</dt>
+            <dd>@Model.ClubName</dd>
+            <dt>Opponent</dt>
+            <dd>@Model.Opponent</dd>
+            <dt>Date</dt>
+            <dd>@Model.MatchDate.ToString("dddd dd MMMM yyyy")</dd>
+            <dt>Kickoff</dt>
+            <dd>@Model.KickoffTime.ToString(@"hh\:mm")</dd>
+            <dt>Venue</dt>
+            <dd>@Model.StadiumName</dd>
+            <dt>Competition</dt>
+            <dd>@(string.IsNullOrWhiteSpace(Model.CompetitionName) ? "Friendly" : Model.CompetitionName)</dd>
+            <dt>Formation</dt>
+            <dd>@(string.IsNullOrWhiteSpace(Model.Formation) ? "Not set" : Model.Formation)</dd>
+            <dt>Scoreline</dt>
+            <dd class="scoreline">@Model.Scoreline</dd>
+        </dl>
+    </div>
+
+    <div class="stack">
+        <div class="card">
+            <div class="card-head"><h2>Squad</h2></div>
+            @if (Model.HasSquad)
+            {
+                <p class="mb-1"><span class="pill pill-active">Squad selected</span></p>
+                <p class="muted small">The coach has picked the starting eleven and bench for this match.</p>
+                <div class="btn-row">
+                    <a class="btn btn-secondary btn-small" asp-controller="Squads" asp-action="Details" asp-route-id="@Model.MatchId">View squad</a>
+                    @if (canManageSquad)
+                    {
+                        <a class="btn btn-secondary btn-small" asp-controller="Squads" asp-action="Edit" asp-route-id="@Model.MatchId">Edit squad</a>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="mb-1"><span class="pill pill-pending">Not selected</span></p>
+                <p class="muted small">No matchday squad has been saved yet.</p>
+                @if (canManageSquad)
+                {
+                    <a class="btn btn-primary btn-small" asp-controller="Squads" asp-action="Select">Select squad</a>
+                }
+            }
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h2>Actions</h2></div>
+            <div class="btn-row">
+                @if (canEdit)
+                {
+                    <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="EditResult" asp-route-id="@Model.MatchId">Edit result</a>
+                    <a class="btn btn-secondary btn-small" asp-controller="Statistics" asp-action="View" asp-route-id="@Model.MatchId">View statistics</a>
+                    <a class="btn btn-secondary btn-small" asp-controller="Statistics" asp-action="Add" asp-route-matchId="@Model.MatchId">Add statistics</a>
+                    <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Index">All matches</a>
+                }
+                else
+                {
+                    <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Fixtures">Fixtures</a>
+                    <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Results">Results</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

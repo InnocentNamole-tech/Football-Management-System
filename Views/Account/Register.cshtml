@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Create an account";
+    ViewData["Description"] = "Fans and competition organisers can create their own account.";
+}
+
+<div class="auth-page auth-page-center fade-up">
+    <div class="auth-card auth-card-wide">
+        <span class="eyebrow">Join the platform</span>
+        <h1>Who are you?</h1>
+        <p class="muted">Choose the account type that fits you. Club staff accounts are issued by the club or the system administrator.</p>
+
+        <div class="choice-grid">
+            <a class="choice-card" asp-controller="Account" asp-action="RegisterFan">
+                <span class="choice-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </span>
+                <h2>Club fan</h2>
+                <p>Follow your club, read announcements, comment on matches and keep up with every fixture.</p>
+                <span class="choice-go">Create fan account &rarr;</span>
+            </a>
+
+            <a class="choice-card" asp-controller="Account" asp-action="RegisterOrganiser">
+                <span class="choice-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z" />
+                        <path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" />
+                    </svg>
+                </span>
+                <h2>Competition organiser</h2>
+                <p>Run tournaments and leagues, handle club requests and record the outcomes.</p>
+                <span class="choice-go">Create organiser account &rarr;</span>
+            </a>
+        </div>
+
+        <p class="small muted mt-2 mb-0">Already have an account? <a asp-controller="Account" asp-action="Login">Sign in</a>.</p>
+    </div>
+</div>

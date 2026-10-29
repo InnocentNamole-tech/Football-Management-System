@@ -1,0 +1,87 @@
+@model PlayerOverview
+@{
+    var canEdit = ViewBag.CanEdit is true;
+    ViewData["Title"] = Model.FullName;
+    ViewData["Description"] = "Player profile, position, jersey number and contact details.";
+    ViewData["Crumb"] = "Players";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Players");
+
+    if (canEdit && Model.IsActive)
+    {
+        ViewData["PrimaryText"] = "Edit player";
+        ViewData["PrimaryUrl"] = Url.Action("Edit", "Players", new { id = Model.PlayerId }) ?? "/Players";
+    }
+}
+
+<partial name="_PageHeader" />
+
+<div class="grid grid-2">
+    <div class="player-card">
+        <span class="jersey">@Model.JerseyNumber</span>
+        <div class="player-top">
+            <div class="avatar">
+                @if (!string.IsNullOrWhiteSpace(Model.ProfilePhotoPath))
+                {
+                    <img src="@Model.ProfilePhotoPath" alt="Photo of @Model.FullName" />
+                }
+                else
+                {
+                    @Model.Initials
+                }
+            </div>
+            <div>
+                <div class="player-name"><span class="first">@Model.FirstName</span> <span class="last">@Model.LastName</span></div>
+                <div class="player-pos">@Model.PositionName</div>
+                <div class="small muted">@Model.ClubName</div>
+            </div>
+        </div>
+        <div class="player-meta">
+            <span><strong>@Model.Nickname</strong></span>
+            @if (!string.IsNullOrWhiteSpace(Model.PlayerStyleName))
+            {
+                <span>@Model.PlayerStyleName</span>
+            }
+            <span>@Model.CityName, @Model.ProvinceName</span>
+        </div>
+        <div class="player-foot">
+            <span class="pill @(Model.IsActive ? "pill-active" : "pill-inactive")">@(Model.IsActive ? "Active" : "Inactive")</span>
+            @if (canEdit && Model.IsActive)
+            {
+                <a class="btn btn-danger btn-small" asp-controller="Players" asp-action="Deactivate" asp-route-id="@Model.PlayerId">Deactivate</a>
+            }
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-head"><h2>Player details</h2></div>
+        <dl class="kv">
+            <dt>Username</dt>
+            <dd>@Model.Username</dd>
+            <dt>Email</dt>
+            <dd>@Model.Email</dd>
+            <dt>Phone</dt>
+            <dd>@Model.Phone</dd>
+            <dt>Position</dt>
+            <dd>@Model.PositionName</dd>
+            <dt>Jersey number</dt>
+            <dd>@Model.JerseyNumber</dd>
+            <dt>Nickname</dt>
+            <dd>@Model.Nickname</dd>
+            <dt>Player style</dt>
+            <dd>@(string.IsNullOrWhiteSpace(Model.PlayerStyleName) ? "—" : Model.PlayerStyleName)</dd>
+            <dt>City</dt>
+            <dd>@Model.CityName, @Model.ProvinceName</dd>
+            <dt>Date joined</dt>
+            <dd>@Model.DateJoined.ToString("dd MMM yyyy")</dd>
+            <dt>Status</dt>
+            <dd>@(Model.IsActive ? "Active" : "Inactive")</dd>
+        </dl>
+        <div class="form-actions">
+            <a class="btn btn-secondary" asp-controller="Players" asp-action="Index">Back to players</a>
+            @if (canEdit)
+            {
+                <a class="btn btn-secondary" asp-controller="Statistics" asp-action="Leaderboards">Leaderboards</a>
+            }
+        </div>
+    </div>
+</div>

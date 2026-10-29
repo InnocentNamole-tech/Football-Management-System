@@ -1,0 +1,33 @@
+@model UnavailabilityRow
+@{
+    ViewData["Title"] = "Delete unavailability";
+    ViewData["Description"] = "Confirm that this date range should be removed from your availability record.";
+    ViewData["Crumb"] = "My unavailability";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+}
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <div class="alert alert-error" role="alert">
+        The unavailability from <strong>@Model.StartDate.ToString("dd MMM yyyy")</strong> to
+        <strong>@Model.EndDate.ToString("dd MMM yyyy")</strong> will be deleted permanently.
+    </div>
+
+    <dl class="kv">
+        <dt>Reason</dt>
+        <dd>@Model.Reason</dd>
+        <dt>Start date</dt>
+        <dd>@Model.StartDate.ToString("dd MMM yyyy")</dd>
+        <dt>End date</dt>
+        <dd>@Model.EndDate.ToString("dd MMM yyyy")</dd>
+        <dt>Days</dt>
+        <dd>@((Model.EndDate - Model.StartDate).Days + 1)</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed" asp-route-id="@Model.UnavailabilityId" method="post">
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Yes, delete unavailability</button>
+            <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

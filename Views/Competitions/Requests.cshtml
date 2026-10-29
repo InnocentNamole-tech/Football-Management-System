@@ -1,0 +1,73 @@
+@model List<CompetitionEntryRow>
+@{
+    var status = ViewData["Status"] as string;
+    ViewData["Title"] = "Entry requests";
+    ViewData["Description"] = "Approve or reject club requests to join your competitions.";
+    ViewData["Crumb"] = "Competitions";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+}
+<partial name="_PageHeader" />
+
+<div class="card dash-list">
+    <div class="section-title">
+        <h2>Requests</h2>
+        <div class="form-actions">
+            <a class="btn btn-small @(string.IsNullOrWhiteSpace(status) ? "btn-primary" : "")" asp-action="Requests">All</a>
+            <a class="btn btn-small @(status == "Pending" ? "btn-primary" : "")" asp-action="Requests" asp-route-status="Pending">Pending</a>
+            <a class="btn btn-small @(status == "Approved" ? "btn-primary" : "")" asp-action="Requests" asp-route-status="Approved">Approved</a>
+            <a class="btn btn-small @(status == "Rejected" ? "btn-primary" : "")" asp-action="Requests" asp-route-status="Rejected">Rejected</a>
+        </div>
+    </div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="empty">
+            <p>No requests to show.</p>
+            <p>Clubs that match a competition's gender and age group will appear here.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data">
+            <thead>
+                <tr>
+                    <th>Competition</th>
+                    <th>Club</th>
+                    <th>Requested</th>
+                    <th>Status</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in Model)
+                {
+                    <tr>
+                        <td><strong>@entry.CompetitionName</strong><br /><span class="help">@entry.CompetitionType · @entry.Gender @entry.AgeGroup</span></td>
+                        <td>@entry.ClubName</td>
+                        <td>@entry.RequestedAt.ToString("dd MMM yyyy")</td>
+                        <td><span class="pill pill-muted">@entry.RequestStatus</span></td>
+                        <td class="nowrap text-right">
+                            @if (entry.RequestStatus == "Pending")
+                            {
+                                <form asp-action="Approve" method="post">
+                                    <input type="hidden" name="id" value="@entry.CompetitionClubId" />
+                                    <button type="submit" class="btn btn-small btn-primary">Approve</button>
+                                </form>
+                                <form asp-action="Reject" method="post">
+                                    <input type="hidden" name="id" value="@entry.CompetitionClubId" />
+                                    <button type="submit" class="btn btn-small btn-ghost">Reject</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="help">Decided</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        </div>
+    }
+</div>

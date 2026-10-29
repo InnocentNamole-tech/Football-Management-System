@@ -1,0 +1,45 @@
+@model CityFormVm
+@{
+    var editing = Model.CityId > 0;
+    ViewData["Title"] = editing ? "Edit city" : "Add city";
+    ViewData["Description"] = editing
+        ? "Update the city name or the province it belongs to."
+        : "Add a city so stadiums and clubs can be linked to it.";
+    ViewData["Crumb"] = "Cities";
+    ViewData["CrumbUrl"] = Url.Action("Cities");
+
+    var provinces = ViewBag.Provinces as List<LookupItem> ?? new List<LookupItem>();
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <form asp-controller="Locations" asp-action="@(editing ? "EditCity" : "CreateCity")" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+        <input type="hidden" asp-for="CityId" />
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="CityName">City name <span class="req">*</span></label>
+                <input asp-for="CityName" class="input" />
+                <span asp-validation-for="CityName" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProvinceId">Province <span class="req">*</span></label>
+                <select asp-for="ProvinceId" class="input">
+                    <option value="">Choose a province</option>
+                    @foreach (var province in provinces)
+                    {
+                        <option value="@province.Id">@province.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="ProvinceId" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">@(editing ? "Save city" : "Add city")</button>
+            <a class="btn btn-secondary" asp-action="Cities">Cancel</a>
+        </div>
+    </form>
+</div>

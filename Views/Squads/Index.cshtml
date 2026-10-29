@@ -1,0 +1,64 @@
+@model List<SquadSummaryRow>
+@{
+    var canManageSquad = ViewBag.CanManageSquad is true;
+    ViewData["Title"] = "Squads";
+    ViewData["Description"] = "Every saved matchday squad for your club, starters and bench together.";
+    if (canManageSquad)
+    {
+        ViewData["PrimaryText"] = "Select a squad";
+        ViewData["PrimaryUrl"] = Url.Action("Select");
+    }
+}
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="card empty">
+        <p>No squads have been named yet.</p>
+        @if (canManageSquad)
+        {
+            <p>Start with the next fixture and pick your eleven.</p>
+            <a class="btn btn-primary" asp-action="Select">Select a squad</a>
+        }
+        else
+        {
+            <p>The coach has not selected a squad for any match yet.</p>
+        }
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>Opponent</th>
+                    <th>Match date</th>
+                    <th>Formation</th>
+                    <th>Starters</th>
+                    <th>Bench</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model)
+                {
+                    <tr>
+                        <td><strong>@row.Opponent</strong></td>
+                        <td>@row.MatchDate.ToString("dd MMM yyyy")</td>
+                        <td>@(string.IsNullOrWhiteSpace(row.Formation) ? "—" : row.Formation)</td>
+                        <td>@row.Starters</td>
+                        <td>@row.Bench</td>
+                        <td class="nowrap text-right">
+                            <a class="btn btn-small" asp-action="Details" asp-route-id="@row.MatchId">View</a>
+                            @if (canManageSquad)
+                            {
+                                <a class="btn btn-small btn-ghost" asp-action="Edit" asp-route-id="@row.MatchId">Edit</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

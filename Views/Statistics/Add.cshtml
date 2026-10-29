@@ -1,0 +1,74 @@
+@model StatEntryVm
+@{
+    ViewData["Title"] = "Add statistics";
+    ViewData["Description"] = "Record one player's performance for a completed match.";
+    ViewData["Crumb"] = "Statistics";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Statistics");
+
+    var matches = ViewBag.Matches as SelectList;
+    var players = ViewBag.Players as SelectList;
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <form asp-controller="Statistics" asp-action="Add" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="MatchId">Match <span class="req">*</span></label>
+                <select asp-for="MatchId" class="input" asp-items="matches">
+                    <option value="">Choose a completed match</option>
+                </select>
+                <span asp-validation-for="MatchId" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PlayerId">Player <span class="req">*</span></label>
+                <select asp-for="PlayerId" class="input" asp-items="players">
+                    <option value="">Choose an active player</option>
+                </select>
+                <span asp-validation-for="PlayerId" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Goal">Goals</label>
+                <input asp-for="Goal" class="input" type="number" min="0" max="99" />
+                <span asp-validation-for="Goal" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Assist">Assists</label>
+                <input asp-for="Assist" class="input" type="number" min="0" max="99" />
+                <span asp-validation-for="Assist" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="YellowCard">Yellow cards</label>
+                <input asp-for="YellowCard" class="input" type="number" min="0" max="2" />
+                <span class="help">0 to 2.</span>
+                <span asp-validation-for="YellowCard" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="RedCard">Red cards</label>
+                <input asp-for="RedCard" class="input" type="number" min="0" max="1" />
+                <span class="help">0 or 1.</span>
+                <span asp-validation-for="RedCard" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MinutesPlayed">Minutes played</label>
+                <input asp-for="MinutesPlayed" class="input" type="number" min="0" max="130" />
+                <span class="help">0 to 130.</span>
+                <span asp-validation-for="MinutesPlayed" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Add statistics</button>
+            <a class="btn btn-secondary" asp-controller="Statistics" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

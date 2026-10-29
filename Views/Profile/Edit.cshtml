@@ -1,0 +1,82 @@
+@model ProfileEditVm
+@{
+    ViewData["Title"] = "Edit profile";
+    ViewData["Description"] = "Update your contact details or upload a new profile photo.";
+    ViewData["Crumb"] = "My profile";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Profile");
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <form asp-controller="Profile" asp-action="Edit" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="FirstName">First name <span class="req">*</span></label>
+                <input asp-for="FirstName" class="input" autocomplete="given-name" />
+                <span asp-validation-for="FirstName" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="LastName">Last name <span class="req">*</span></label>
+                <input asp-for="LastName" class="input" autocomplete="family-name" />
+                <span asp-validation-for="LastName" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email">Email <span class="req">*</span></label>
+                <input asp-for="Email" class="input" type="email" autocomplete="email" />
+                <span asp-validation-for="Email" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Phone">Phone <span class="req">*</span></label>
+                <input asp-for="Phone" class="input" type="tel" autocomplete="tel" maxlength="10" />
+                <span class="help">10 digits, starting with 0.</span>
+                <span asp-validation-for="Phone" class="field-error"></span>
+            </div>
+
+            <div class="form-group span-2">
+                <label asp-for="Photo">Profile photo</label>
+                <input asp-for="Photo" class="input" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
+                <span class="help">JPG or PNG only, up to 2 MB. A square image works best.</span>
+                <span asp-validation-for="Photo" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div>
+            <h2>Change password</h2>
+            <p class="muted small">Leave all three fields blank to keep your current password.</p>
+
+            <div class="form-grid">
+                <div class="form-group span-2">
+                    <label asp-for="CurrentPassword">Current password</label>
+                    <input asp-for="CurrentPassword" class="input" autocomplete="current-password" />
+                    <span asp-validation-for="CurrentPassword" class="field-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="NewPassword">New password</label>
+                    <input asp-for="NewPassword" class="input" autocomplete="new-password" />
+                    <span class="help">8 to 64 characters with uppercase, lowercase, a digit and a special character.</span>
+                    <span asp-validation-for="NewPassword" class="field-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword">Confirm new password</label>
+                    <input asp-for="ConfirmPassword" class="input" autocomplete="new-password" />
+                    <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save changes</button>
+            <a class="btn btn-secondary" asp-controller="Profile" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

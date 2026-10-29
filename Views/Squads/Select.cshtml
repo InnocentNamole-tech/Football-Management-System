@@ -1,0 +1,63 @@
+@model SquadStep1Vm
+@{
+    ViewData["Title"] = "Select a squad";
+    ViewData["Description"] = "Step 1 of 4 — choose the match and the shape you will play.";
+    ViewData["Crumb"] = "Squads";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+    var matches = ViewBag.Matches as List<MatchRow> ?? new List<MatchRow>();
+    var formations = ViewBag.Formations as string[] ?? Array.Empty<string>();
+}
+<partial name="_PageHeader" />
+
+<ol class="stepper" aria-label="Squad selection progress">
+    <li class="current">Match &amp; formation</li>
+    <li>Starting eleven</li>
+    <li>Bench</li>
+    <li>Review</li>
+</ol>
+
+<form asp-action="Select" method="post" class="form-card">
+    <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+
+    @if (matches.Count == 0)
+    {
+        <div class="empty">
+            <p>There are no matches to prepare for yet.</p>
+            <p>Ask your coordinator to schedule a fixture first.</p>
+        </div>
+    }
+    else
+    {
+        <div class="form-grid">
+            <div class="form-group span-2">
+                <label asp-for="MatchId">Match</label>
+                <select asp-for="MatchId" class="input">
+                    <option value="0">Choose a match…</option>
+                    @foreach (var match in matches)
+                    {
+                        <option value="@match.MatchId">@match.MatchDate.ToString("dd MMM yyyy") — @match.Opponent@(match.CompetitionName is null ? "" : $" ({match.CompetitionName})")</option>
+                    }
+                </select>
+                <span asp-validation-for="MatchId" class="field-error"></span>
+            </div>
+
+            <div class="form-group span-2">
+                <label asp-for="Formation">Formation</label>
+                <select asp-for="Formation" class="input">
+                    <option value="">Choose a formation…</option>
+                    @foreach (var formation in formations)
+                    {
+                        <option value="@formation">@formation</option>
+                    }
+                </select>
+                <span asp-validation-for="Formation" class="field-error"></span>
+                <span class="help">The formation is stored with the squad and shown on the match sheet.</span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Continue to starters</button>
+            <a class="btn btn-ghost" asp-action="Index">Cancel</a>
+        </div>
+    }
+</form>

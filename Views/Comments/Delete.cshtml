@@ -1,0 +1,32 @@
+@model CommentRow
+@{
+    ViewData["Title"] = "Delete comment";
+    ViewData["Description"] = "Confirm that this comment should be removed from the match feed.";
+    ViewData["Crumb"] = "Comments";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+}
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <div class="alert alert-error" role="alert">
+        This comment on <strong>@Model.ClubName vs @Model.Opponent</strong> will be deleted permanently.
+    </div>
+
+    <dl class="kv">
+        <dt>Match</dt>
+        <dd>@Model.ClubName vs @Model.Opponent</dd>
+        <dt>Played</dt>
+        <dd>@Model.MatchDate.ToString("dd MMM yyyy")</dd>
+        <dt>Posted</dt>
+        <dd>@Model.PostedAt.ToString("dd MMM yyyy HH:mm")</dd>
+        <dt>Comment</dt>
+        <dd>@Model.CommentText</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed" asp-route-id="@Model.CommentId" method="post">
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Yes, delete comment</button>
+            <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,491 @@
+@model DashboardVm
+@{
+    ViewData["Title"] = "Dashboard";
+
+    var roleLine = Model.Role switch
+    {
+        RoleNames.Admin => "Accounts, clubs and access across the whole platform.",
+        RoleNames.Organiser => "Your competitions, club requests and recorded outcomes.",
+        RoleNames.Coordinator => "Squad administration, fixtures, statistics and club news.",
+        RoleNames.Coach => "Selection, availability and matchday preparation.",
+        RoleNames.Player => "Your season, your numbers and the next fixture.",
+        _ => "Fixtures, results and everything around the club."
+    };
+}
+
+<section class="hero welcome fade-up">
+    <div class="hero-split">
+        <div class="hero-content">
+            <span class="eyebrow">@Model.Role@(string.IsNullOrWhiteSpace(Model.ClubName) ? "" : " · " + Model.ClubName)</span>
+            <h1>Welcome back, @Model.FullName</h1>
+            <p>@roleLine</p>
+        </div>
+        @if (Model.NextFixture is not null)
+        {
+            var fixture = Model.NextFixture;
+            <div class="hero-score">
+                <div class="label">Next fixture</div>
+                <div class="value">@fixture.ClubName vs @fixture.Opponent</div>
+                <div class="when">@fixture.MatchDate.ToString("ddd dd MMM yyyy") · @fixture.KickoffTime.ToString(@"hh\:mm")</div>
+                <div class="when">@fixture.StadiumName</div>
+            </div>
+        }
+    </div>
+</section>
+
+@if (Model.ShowGettingStarted && Model.GettingStarted.Count > 0)
+{
+    <div class="card mt-2 fade-up">
+        <div class="card-head">
+            <div>
+                <h2>Getting started</h2>
+                <p class="muted small mb-0">A quick tour for your role. This guide appears once.</p>
+            </div>
+        </div>
+        <ol class="steps">
+            @foreach (var step in Model.GettingStarted)
+            {
+                <li>
+                    <h4>@step.Title</h4>
+                    <p>@step.Description</p>
+                    <a class="btn btn-secondary btn-small" href="@step.Url">@step.ActionText</a>
+                </li>
+            }
+        </ol>
+    </div>
+}
+
+@if (Model.Role == RoleNames.Admin && Model.Counts is not null)
+{
+    var counts = Model.Counts;
+    <div class="stat-grid mt-2">
+        <div class="stat"><div class="value">@counts.Admins</div><div class="label">Admins</div></div>
+        <div class="stat"><div class="value">@counts.Organisers</div><div class="label">Organisers</div></div>
+        <div class="stat"><div class="value">@counts.Coordinators</div><div class="label">Coordinators</div></div>
+        <div class="stat"><div class="value">@counts.Coaches</div><div class="label">Coaches</div></div>
+        <div class="stat"><div class="value">@counts.Players</div><div class="label">Players</div></div>
+        <div class="stat"><div class="value">@counts.Fans</div><div class="label">Fans</div></div>
+        <div class="stat"><div class="value">@counts.Clubs</div><div class="label">Clubs</div></div>
+        <div class="stat"><div class="value">@counts.Competitions</div><div class="label">Competitions</div></div>
+        <div class="stat"><div class="value">@counts.Matches</div><div class="label">Matches</div></div>
+    </div>
+
+    <div class="dash-grid">
+        <div class="card dash-card">
+            <div class="card-head"><h2>Account administration</h2></div>
+            <p class="muted small">Create new accounts, reset a forgotten password or unlock a locked account.</p>
+            <div class="btn-row">
+                <a class="btn btn-primary btn-small" asp-controller="Admin" asp-action="Create">Create account</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Admin" asp-action="Accounts">View accounts</a>
+            </div>
+        </div>
+        <div class="card dash-card">
+            <div class="card-head"><h2>Clubs</h2></div>
+            <p class="muted small">Review the clubs on the platform, their home cities and stadiums.</p>
+            <div class="btn-row">
+                <a class="btn btn-secondary btn-small" asp-controller="Clubs" asp-action="Index">View clubs</a>
+            </div>
+        </div>
+    </div>
+}
+else if (Model.Role == RoleNames.Organiser)
+{
+    <div class="dash-grid">
+        <div class="card dash-card">
+            <div class="card-head">
+                <h2>My competitions</h2>
+                <a asp-controller="Competitions" asp-action="Index">View all</a>
+            </div>
+            @if (Model.OrganiserCompetitions.Count == 0)
+            {
+                <div class="empty">
+                    <h3>No competitions yet</h3>
+                    <p>Create your first competition and clubs can start requesting a place.</p>
+                    <a class="btn btn-primary btn-small" asp-controller="Competitions" asp-action="Create">Create competition</a>
+                </div>
+            }
+            else
+            {
+                <ul class="dash-list">
+                    @foreach (var competition in Model.OrganiserCompetitions.Take(5))
+                    {
+                        <li>
+                            <span class="who">
+                                <a asp-controller="Competitions" asp-action="Details" asp-route-id="@competition.CompetitionId">@competition.CompetitionName</a>
+                                <small>@competition.CompetitionType · @competition.StartDate.ToString("dd MMM yyyy") · @competition.CompetitionStatus</small>
+                            </span>
+                            <span class="pill @(competition.PendingCount > 0 ? "pill-pending" : "pill-approved")">
+                                @competition.ApprovedCount approved
+                            </span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="card dash-card">
+            <div class="card-head">
+                <h2>Pending requests</h2>
+                <a asp-controller="Competitions" asp-action="Requests" asp-route-status="Pending">Manage</a>
+            </div>
+            @if (Model.PendingRequests.Count == 0)
+            {
+                <div class="empty">
+                    <h3>Nothing waiting</h3>
+                    <p>Every request has been reviewed. New requests will appear here.</p>
+                </div>
+            }
+            else
+            {
+                <ul class="dash-list">
+                    @foreach (var request in Model.PendingRequests.Take(5))
+                    {
+                        <li>
+                            <span class="who">
+                                <strong>@request.ClubName</strong>
+                                <small>@request.CompetitionName · requested @request.RequestedAt.ToString("dd MMM yyyy")</small>
+                            </span>
+                            <span class="pill pill-pending">Pending</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-head"><h2>Quick actions</h2></div>
+        <div class="btn-row">
+            <a class="btn btn-primary btn-small" asp-controller="Competitions" asp-action="Create">Create competition</a>
+            <a class="btn btn-secondary btn-small" asp-controller="Competitions" asp-action="Requests">Manage requests</a>
+            <a class="btn btn-secondary btn-small" asp-controller="Competitions" asp-action="Outcomes">Record outcomes</a>
+        </div>
+    </div>
+}
+else if (Model.Role == RoleNames.Player)
+{
+    @if (Model.Player is not null)
+    {
+        var player = Model.Player;
+        var totals = Model.PlayerTotals;
+        <div class="grid grid-2 mt-2">
+            <div class="player-card">
+                <span class="jersey">@player.JerseyNumber</span>
+                <div class="player-top">
+                    <div class="avatar">
+                        @if (!string.IsNullOrWhiteSpace(player.ProfilePhotoPath))
+                        {
+                            <img src="@player.ProfilePhotoPath" alt="Photo of @player.FullName" />
+                        }
+                        else
+                        {
+                            @player.Initials
+                        }
+                    </div>
+                    <div>
+                        <div class="player-name"><span class="first">@player.FirstName</span> <span class="last">@player.LastName</span></div>
+                        <div class="player-pos">@player.PositionName</div>
+                        <div class="small muted">@player.ClubName</div>
+                    </div>
+                </div>
+                <div class="player-meta">
+                    <span><strong>@player.Nickname</strong></span>
+                    @if (!string.IsNullOrWhiteSpace(player.PlayerStyleName))
+                    {
+                        <span>@player.PlayerStyleName</span>
+                    }
+                    <span>@player.CityName, @player.ProvinceName</span>
+                </div>
+                <div class="player-foot">
+                    <span class="pill @(player.IsActive ? "pill-active" : "pill-inactive")">@(player.IsActive ? "Active" : "Inactive")</span>
+                    <a class="btn btn-secondary btn-small" asp-controller="Profile" asp-action="Index">View profile</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-head">
+                    <h2>Season numbers</h2>
+                    <a asp-controller="Statistics" asp-action="Mine">All statistics</a>
+                </div>
+                @if (totals is null || totals.MatchesPlayed == 0)
+                {
+                    <div class="empty">
+                        <h3>No match statistics yet</h3>
+                        <p>Your numbers appear once the coordinator records your first match.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="stat-grid">
+                        <div class="stat"><div class="value">@totals.MatchesPlayed</div><div class="label">Appearances</div></div>
+                        <div class="stat"><div class="value">@totals.Goals</div><div class="label">Goals</div></div>
+                        <div class="stat"><div class="value">@totals.Assists</div><div class="label">Assists</div></div>
+                        <div class="stat"><div class="value">@totals.MinutesPlayed</div><div class="label">Minutes</div></div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="dash-grid">
+            <div class="card dash-card">
+                <div class="card-head">
+                    <h2>Next fixture</h2>
+                    <a asp-controller="Matches" asp-action="Fixtures">View all</a>
+                </div>
+                @if (Model.NextFixture is not null)
+                {
+                    var fixture = Model.NextFixture;
+                    <div class="fixture-card">
+                        <div class="vs">@fixture.ClubName vs @fixture.Opponent</div>
+                        <div class="when">@fixture.MatchDate.ToString("dddd dd MMM yyyy") · @fixture.KickoffTime.ToString(@"hh\:mm")</div>
+                        <div class="when">@fixture.StadiumName@(string.IsNullOrWhiteSpace(fixture.CompetitionName) ? "" : " · " + fixture.CompetitionName)</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty"><p class="mb-0">No fixture is scheduled yet.</p></div>
+                }
+            </div>
+
+            <div class="card dash-card">
+                <div class="card-head">
+                    <h2>Recent performances</h2>
+                    <a asp-controller="Statistics" asp-action="Mine">View all</a>
+                </div>
+                @if (Model.MyMatchStats.Count == 0)
+                {
+                    <div class="empty"><p class="mb-0">No match statistics recorded yet.</p></div>
+                }
+                else
+                {
+                    <ul class="dash-list">
+                        @foreach (var stat in Model.MyMatchStats)
+                        {
+                            <li>
+                                <span class="who">
+                                    <strong>vs @stat.Opponent</strong>
+                                    <small>@stat.MatchDate.ToString("dd MMM yyyy") · @stat.MinutesPlayed min</small>
+                                </span>
+                                <span class="small">@stat.Goal G · @stat.Assist A · @stat.YellowCard Y · @stat.RedCard R</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+
+            <div class="card dash-card">
+                <div class="card-head">
+                    <h2>Injuries</h2>
+                    <a asp-controller="Injuries" asp-action="Index">View all</a>
+                </div>
+                @if (Model.MyInjuries.Count == 0)
+                {
+                    <div class="empty"><p class="mb-0">No injuries recorded.</p></div>
+                }
+                else
+                {
+                    <ul class="dash-list">
+                        @foreach (var injury in Model.MyInjuries.Take(4))
+                        {
+                            <li>
+                                <span class="who"><strong>@injury.InjuryType</strong><small>@injury.InjuryDate.ToString("dd MMM yyyy")</small></span>
+                                <span class="pill @(string.IsNullOrWhiteSpace(injury.ActualRecovery) ? "pill-pending" : "pill-approved")">
+                                    @(string.IsNullOrWhiteSpace(injury.ActualRecovery) ? "Rehab" : "Recovered")
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+
+            <div class="card dash-card">
+                <div class="card-head">
+                    <h2>Unavailability</h2>
+                    <a asp-controller="Unavailabilities" asp-action="Index">View all</a>
+                </div>
+                @if (Model.MyUnavailabilities.Count == 0)
+                {
+                    <div class="empty">
+                        <p>No unavailability recorded.</p>
+                        <a class="btn btn-secondary btn-small" asp-controller="Unavailabilities" asp-action="Create">Add unavailability</a>
+                    </div>
+                }
+                else
+                {
+                    <ul class="dash-list">
+                        @foreach (var item in Model.MyUnavailabilities.Take(4))
+                        {
+                            <li>
+                                <span class="who"><strong>@item.Reason</strong><small>@item.StartDate.ToString("dd MMM") – @item.EndDate.ToString("dd MMM yyyy")</small></span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="dash-grid">
+        <div class="card dash-card">
+            <div class="card-head">
+                <h2>Next fixture</h2>
+                <a asp-controller="Matches" asp-action="Fixtures">View all</a>
+            </div>
+            @if (Model.NextFixture is not null)
+            {
+                var fixture = Model.NextFixture;
+                <div class="fixture-card">
+                    <div class="vs">@fixture.ClubName vs @fixture.Opponent</div>
+                    <div class="when">@fixture.MatchDate.ToString("dddd dd MMM yyyy") · @fixture.KickoffTime.ToString(@"hh\:mm")</div>
+                    <div class="when">@fixture.StadiumName@(string.IsNullOrWhiteSpace(fixture.CompetitionName) ? "" : " · " + fixture.CompetitionName)</div>
+                </div>
+            }
+            else
+            {
+                <div class="empty"><p class="mb-0">No fixture is scheduled yet.</p></div>
+            }
+        </div>
+
+        <div class="card dash-card">
+            <div class="card-head">
+                <h2>Recent results</h2>
+                <a asp-controller="Matches" asp-action="Results">View all</a>
+            </div>
+            @if (Model.RecentResults.Count == 0)
+            {
+                <div class="empty"><p class="mb-0">No results recorded yet.</p></div>
+            }
+            else
+            {
+                <ul class="dash-list">
+                    @foreach (var result in Model.RecentResults)
+                    {
+                        <li>
+                            <span class="who">
+                                <strong>vs @result.Opponent</strong>
+                                <small>@result.MatchDate.ToString("dd MMM yyyy")</small>
+                            </span>
+                            <span>
+                                <span class="scoreline">@result.Scoreline</span>
+                                <span class="result @(result.Result == "Win" ? "result-win" : result.Result == "Loss" ? "result-loss" : "result-draw")">@result.Result</span>
+                            </span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="card dash-card">
+            <div class="card-head">
+                <h2>Top performers</h2>
+                <a asp-controller="Statistics" asp-action="Leaderboards">Leaderboards</a>
+            </div>
+            @if (Model.TopScorers.Count == 0 && Model.TopAssists.Count == 0)
+            {
+                <div class="empty"><p class="mb-0">No player statistics recorded yet.</p></div>
+            }
+            else
+            {
+                <ul class="dash-list">
+                    @foreach (var scorer in Model.TopScorers.Take(3))
+                    {
+                        <li>
+                            <span class="who"><strong>@scorer.FullName</strong><small>@scorer.PositionName · #@scorer.JerseyNumber</small></span>
+                            <span class="leader-number">@scorer.Value goals</span>
+                        </li>
+                    }
+                    @foreach (var assist in Model.TopAssists.Take(3))
+                    {
+                        <li>
+                            <span class="who"><strong>@assist.FullName</strong><small>@assist.PositionName · #@assist.JerseyNumber</small></span>
+                            <span class="leader-number">@assist.Value assists</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="card dash-card">
+            <div class="card-head">
+                <h2>Discipline</h2>
+                <a asp-controller="Statistics" asp-action="Leaderboards">View all</a>
+            </div>
+            @if (Model.YellowCards.Count == 0 && Model.RedCards.Count == 0)
+            {
+                <div class="empty"><p class="mb-0">No cards recorded yet.</p></div>
+            }
+            else
+            {
+                <ul class="dash-list">
+                    @foreach (var card in Model.YellowCards.Take(3))
+                    {
+                        <li>
+                            <span class="who"><strong>@card.FullName</strong><small>@card.PositionName</small></span>
+                            <span class="pill pill-pending">@card.Value yellow</span>
+                        </li>
+                    }
+                    @foreach (var card in Model.RedCards.Take(3))
+                    {
+                        <li>
+                            <span class="who"><strong>@card.FullName</strong><small>@card.PositionName</small></span>
+                            <span class="pill pill-rejected">@card.Value red</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="card dash-card">
+            <div class="card-head">
+                <h2>Latest announcements</h2>
+                <a asp-controller="Announcements" asp-action="Index">View all</a>
+            </div>
+            @if (Model.Announcements.Count == 0)
+            {
+                <div class="empty"><p class="mb-0">No announcements have been posted.</p></div>
+            }
+            else
+            {
+                <ul class="dash-list">
+                    @foreach (var announcement in Model.Announcements)
+                    {
+                        <li>
+                            <span class="who">
+                                <strong>@announcement.Title</strong>
+                                <small>@announcement.AuthorName · @announcement.DatePosted.ToString("dd MMM yyyy")</small>
+                            </span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-head"><h2>Quick actions</h2></div>
+        <div class="btn-row">
+            @if (Model.Role == RoleNames.Coordinator)
+            {
+                <a class="btn btn-primary btn-small" asp-controller="Players" asp-action="Create">Register player</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Create">Create match</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Injuries" asp-action="Record">Record injury</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Announcements" asp-action="Create">Post announcement</a>
+            }
+            else if (Model.Role == RoleNames.Coach)
+            {
+                <a class="btn btn-primary btn-small" asp-controller="Squads" asp-action="Select">Select squad</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Players" asp-action="Index">View players</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Unavailabilities" asp-action="Club">Check availability</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Injuries" asp-action="Index">View injuries</a>
+            }
+            else
+            {
+                <a class="btn btn-primary btn-small" asp-controller="Comments" asp-action="Create">Add comment</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Announcements" asp-action="Index">Read announcements</a>
+                <a class="btn btn-secondary btn-small" asp-controller="Competitions" asp-action="Index">View competitions</a>
+            }
+        </div>
+    </div>
+}

@@ -1,0 +1,58 @@
+@model List<CommentRow>
+@{
+    var personId = ViewBag.PersonId is int id ? id : 0;
+    var isFan = User.IsInRole("Fan");
+    ViewData["Title"] = "Comments";
+    ViewData["Description"] = isFan
+        ? "Fan talk on completed matches — post, trim and edit your own."
+        : "What fans are saying about your club's matches.";
+    if (isFan)
+    {
+        ViewData["PrimaryText"] = "Add comment";
+        ViewData["PrimaryUrl"] = Url.Action("Create");
+    }
+}
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="card empty">
+        <p>No comments have been posted yet.</p>
+        @if (isFan)
+        {
+            <p>Be the first to have your say on a completed match.</p>
+            <a class="btn btn-primary" asp-action="Create">Add comment</a>
+        }
+        else
+        {
+            <p>Fan comments on completed matches will appear here.</p>
+        }
+    </div>
+}
+else
+{
+    <div class="grid grid-2">
+        @foreach (var item in Model)
+        {
+            <article class="card comment">
+                <header>
+                    <div>
+                        <strong>@item.AuthorName</strong>
+                        <span class="pill pill-muted">@item.ClubName</span>
+                    </div>
+                    <span class="help">@item.PostedAt.ToString("dd MMM yyyy HH:mm")</span>
+                </header>
+                <p class="help">@item.Opponent · @item.MatchDate.ToString("dd MMM yyyy")</p>
+                <p>@item.CommentText</p>
+                <footer>
+                    <a class="btn btn-small btn-ghost" asp-controller="Matches" asp-action="Details" asp-route-id="@item.MatchId">View match</a>
+                    @if (isFan && item.PersonId == personId)
+                    {
+                        <a class="btn btn-small" asp-action="Edit" asp-route-id="@item.CommentId">Edit</a>
+                        <a class="btn btn-small btn-danger" asp-action="Delete" asp-route-id="@item.CommentId">Delete</a>
+                    }
+                </footer>
+            </article>
+        }
+    </div>
+}

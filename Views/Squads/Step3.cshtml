@@ -1,0 +1,64 @@
+@model SquadSelectionVm
+@{
+    ViewData["Title"] = "Pick the bench";
+    ViewData["Description"] = Model.HelpText;
+    ViewData["Crumb"] = "Squads";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+    var selected = Model.Selected.ToHashSet();
+}
+<partial name="_PageHeader" />
+
+<ol class="stepper" aria-label="Squad selection progress">
+    <li class="done">Match &amp; formation</li>
+    <li class="done">Starting eleven</li>
+    <li class="current">Bench</li>
+    <li>Review</li>
+</ol>
+
+<div class="card stage-band">
+    <div>
+        <span class="pill pill-muted">@Model.Formation</span>
+        <strong>@Model.MatchLabel</strong>
+    </div>
+    <p>@Model.HelpText</p>
+</div>
+
+<form asp-action="Step3" method="post" class="form-card">
+    <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+
+    @if (Model.Options.Count == 0)
+    {
+        <div class="empty">
+            <p>Every active player is already in the starting eleven.</p>
+            <p>You can continue with an empty bench.</p>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Continue to review</button>
+            <a class="btn btn-ghost" asp-action="Step2">Back</a>
+        </div>
+    }
+    else
+    {
+        <ul class="check-list">
+            @foreach (var option in Model.Options)
+            {
+                <li>
+                    <label>
+                        <input type="checkbox" name="selected" value="@option.PlayerId" checked="@selected.Contains(option.PlayerId)" />
+                        <span class="num">@option.JerseyNumber</span>
+                        <span class="who">
+                            <strong>@option.FullName</strong>
+                            <small>@option.PositionName</small>
+                        </span>
+                    </label>
+                </li>
+            }
+        </ul>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Continue to review</button>
+            <a class="btn btn-ghost" asp-action="Step2">Back</a>
+        </div>
+    }
+</form>

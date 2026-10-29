@@ -1,0 +1,59 @@
+@model AccountDeleteContext
+@{
+    ViewData["Title"] = "Remove account";
+    ViewData["Description"] = "Permanently remove this person and their records from the platform.";
+    ViewData["Crumb"] = "Accounts";
+    ViewData["CrumbUrl"] = Url.Action("Accounts", "Admin");
+
+    var isLastAdmin = Model.Role == RoleNames.Admin && Model.AdminCount <= 1;
+    var ownsCompetitions = Model.OrganisedCompetitions > 0;
+    var canRemove = !isLastAdmin && !ownsCompetitions;
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    @if (isLastAdmin)
+    {
+        <div class="alert alert-error" role="alert">
+            <strong>@Model.FullName</strong> is the last system administrator and cannot be removed.
+        </div>
+    }
+    else if (ownsCompetitions)
+    {
+        <div class="alert alert-error" role="alert">
+            <strong>@Model.FullName</strong> still owns @Model.OrganisedCompetitions competition@(Model.OrganisedCompetitions == 1 ? "" : "s").
+            Remove or reassign those competitions before removing this organiser.
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-error" role="alert">
+            Removing <strong>@Model.FullName</strong> permanently deletes the account together with their memberships,
+            squad selections, statistics, injuries, unavailability records and comments. This cannot be undone.
+        </div>
+    }
+
+    <dl class="kv">
+        <dt>Name</dt>
+        <dd>@Model.FullName</dd>
+        <dt>Username</dt>
+        <dd>@Model.Username</dd>
+        <dt>Email</dt>
+        <dd>@Model.Email</dd>
+        <dt>Role</dt>
+        <dd>@(string.IsNullOrWhiteSpace(Model.Role) ? "—" : Model.Role)</dd>
+        <dt>Club</dt>
+        <dd>@(string.IsNullOrWhiteSpace(Model.ClubName) ? "No club" : Model.ClubName)</dd>
+    </dl>
+
+    <form asp-controller="Admin" asp-action="DeleteConfirmed" asp-route-id="@Model.PersonId" method="post">
+        <div class="form-actions">
+            @if (canRemove)
+            {
+                <button type="submit" class="btn btn-danger">Yes, remove account</button>
+            }
+            <a class="btn btn-secondary" asp-controller="Admin" asp-action="Accounts">Cancel</a>
+        </div>
+    </form>
+</div>

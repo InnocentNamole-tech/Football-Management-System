@@ -1,0 +1,59 @@
+@model SquadSelectionVm
+@{
+    ViewData["Title"] = "Starting eleven";
+    ViewData["Description"] = Model.HelpText;
+    ViewData["Crumb"] = "Squads";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+    var selected = Model.Selected.ToHashSet();
+}
+<partial name="_PageHeader" />
+
+<ol class="stepper" aria-label="Squad selection progress">
+    <li class="done">Match &amp; formation</li>
+    <li class="current">Starting eleven</li>
+    <li>Bench</li>
+    <li>Review</li>
+</ol>
+
+<div class="card stage-band">
+    <div>
+        <span class="pill pill-muted">@Model.Formation</span>
+        <strong>@Model.MatchLabel</strong>
+    </div>
+    <p>@Model.HelpText</p>
+</div>
+
+<form asp-action="Step2" method="post" class="form-card">
+    <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+
+    @if (Model.Options.Count == 0)
+    {
+        <div class="empty">
+            <p>No active players are available for selection.</p>
+            <p>Ask your coordinator to register or reactivate players first.</p>
+        </div>
+    }
+    else
+    {
+        <ul class="check-list">
+            @foreach (var option in Model.Options)
+            {
+                <li>
+                    <label>
+                        <input type="checkbox" name="selected" value="@option.PlayerId" checked="@selected.Contains(option.PlayerId)" />
+                        <span class="num">@option.JerseyNumber</span>
+                        <span class="who">
+                            <strong>@option.FullName</strong>
+                            <small>@option.PositionName</small>
+                        </span>
+                    </label>
+                </li>
+            }
+        </ul>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Continue to bench</button>
+            <a class="btn btn-ghost" asp-action="Select">Back</a>
+        </div>
+    }
+</form>

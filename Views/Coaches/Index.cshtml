@@ -1,0 +1,54 @@
+@model List<CoachRow>
+@{
+    var clubName = ViewBag.ClubName as string;
+    ViewData["Title"] = "Coaches";
+    ViewData["Description"] = string.IsNullOrWhiteSpace(clubName)
+        ? "The coaching staff registered at your club."
+        : $"The coaching staff of {clubName}.";
+    ViewData["PrimaryText"] = "Register coach";
+    ViewData["PrimaryUrl"] = Url.Action("Create", "Coaches") ?? "/Coaches/Create";
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No coaches registered</h3>
+        <p>Add the coaching staff so they can select squads and review player availability.</p>
+        <a class="btn btn-primary btn-small" asp-controller="Coaches" asp-action="Create">Register the first coach</a>
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Coach</th>
+                <th>Specialization</th>
+                <th>Licence</th>
+                <th>Club</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Joined</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var coach in Model)
+            {
+                <tr>
+                    <td><strong>@coach.FullName</strong></td>
+                    <td>@coach.SpecializationName</td>
+                    <td><span class="pill pill-gold">@coach.LicenseLevel</span></td>
+                    <td>@coach.ClubName</td>
+                    <td>@coach.Email</td>
+                    <td>@coach.Phone</td>
+                    <td class="nowrap">@coach.DateJoined.ToString("dd MMM yyyy")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="table-note">@Model.Count coach@(Model.Count == 1 ? "" : "es") on the staff.</p>
+}

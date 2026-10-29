@@ -1,0 +1,64 @@
+@model List<MatchRow>
+@{
+    var clubName = ViewBag.ClubName as string;
+    ViewData["Title"] = "Results";
+    ViewData["Description"] = string.IsNullOrWhiteSpace(clubName)
+        ? "Completed matches and the final scorelines for your club."
+        : $"Completed matches and final scorelines for {clubName}.";
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No results yet</h3>
+        <p>Results appear once the coordinator records a scoreline.</p>
+        <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Fixtures">View fixtures</a>
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Opponent</th>
+                <th>Competition</th>
+                <th>Venue</th>
+                <th>Score</th>
+                <th>Outcome</th>
+                <th>Comments</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var match in Model)
+            {
+                <tr>
+                    <td class="nowrap">@match.MatchDate.ToString("dd MMM yyyy")</td>
+                    <td><strong>@match.Opponent</strong></td>
+                    <td>@(string.IsNullOrWhiteSpace(match.CompetitionName) ? "Friendly" : match.CompetitionName)</td>
+                    <td>@match.StadiumName</td>
+                    <td class="scoreline">@match.Scoreline</td>
+                    <td>
+                        <span class="result @(match.Result == "Win" ? "result-win" : match.Result == "Loss" ? "result-loss" : "result-draw")">@match.Result</span>
+                    </td>
+                    <td>@match.CommentCount</td>
+                    <td>
+                        <div class="actions">
+                            <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Details" asp-route-id="@match.MatchId">View</a>
+                            @if (match.HasSquad)
+                            {
+                                <a class="btn btn-secondary btn-small" asp-controller="Squads" asp-action="Details" asp-route-id="@match.MatchId">Squad</a>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="table-note">@Model.Count completed match@(Model.Count == 1 ? "" : "es").</p>
+}

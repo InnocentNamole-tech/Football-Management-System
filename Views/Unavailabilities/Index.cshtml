@@ -1,0 +1,51 @@
+@model List<UnavailabilityRow>
+@{
+    ViewData["Title"] = "My unavailability";
+    ViewData["Description"] = "The dates you have told the club you cannot play.";
+    ViewData["PrimaryText"] = "Add unavailability";
+    ViewData["PrimaryUrl"] = Url.Action("Create", "Unavailabilities") ?? "/Unavailabilities/Create";
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No unavailability recorded</h3>
+        <p>Add a date range when you cannot train or play so the coach can plan selection.</p>
+        <a class="btn btn-primary btn-small" asp-controller="Unavailabilities" asp-action="Create">Add unavailability</a>
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Reason</th>
+                <th>Start date</th>
+                <th>End date</th>
+                <th>Days</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><strong>@item.Reason</strong></td>
+                    <td class="nowrap">@item.StartDate.ToString("dd MMM yyyy")</td>
+                    <td class="nowrap">@item.EndDate.ToString("dd MMM yyyy")</td>
+                    <td>@((item.EndDate - item.StartDate).Days + 1)</td>
+                    <td>
+                        <span class="btn-row">
+                            <a class="btn btn-secondary btn-small" asp-controller="Unavailabilities" asp-action="Edit" asp-route-id="@item.UnavailabilityId">Edit</a>
+                            <a class="btn btn-danger btn-small" asp-controller="Unavailabilities" asp-action="Delete" asp-route-id="@item.UnavailabilityId">Delete</a>
+                        </span>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

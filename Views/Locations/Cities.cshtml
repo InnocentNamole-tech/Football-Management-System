@@ -1,0 +1,50 @@
+@model List<CityRow>
+@{
+    ViewData["Title"] = "Cities";
+    ViewData["Description"] = "Every city on the platform, with the provinces, stadiums and clubs attached to each one.";
+    ViewData["PrimaryText"] = "Add city";
+    ViewData["PrimaryUrl"] = Url.Action("CreateCity");
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No cities yet</h3>
+        <p>Add a city before registering a stadium or a club in that area.</p>
+        <a class="btn btn-primary btn-small" asp-action="CreateCity">Add the first city</a>
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>City</th>
+                    <th>Province</th>
+                    <th>Stadiums</th>
+                    <th>Clubs</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var city in Model)
+                {
+                    <tr>
+                        <td><strong>@city.CityName</strong></td>
+                        <td>@city.ProvinceName</td>
+                        <td>@city.StadiumCount</td>
+                        <td>@city.ClubCount</td>
+                        <td class="nowrap text-right">
+                            <a class="btn btn-secondary btn-small" asp-action="City" asp-route-id="@city.CityId">View</a>
+                            <a class="btn btn-secondary btn-small" asp-action="EditCity" asp-route-id="@city.CityId">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <p class="table-note">@Model.Count cities across @(Model.Select(c => c.ProvinceId).Distinct().Count()) provinces.</p>
+}

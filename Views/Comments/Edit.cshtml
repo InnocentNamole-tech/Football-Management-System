@@ -1,0 +1,35 @@
+@model CommentVm
+@{
+    ViewData["Title"] = "Edit comment";
+    ViewData["Description"] = "Reword your comment on this match.";
+    ViewData["Crumb"] = "Comments";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+    var matches = ViewBag.Matches as SelectList;
+}
+<partial name="_PageHeader" />
+
+<form asp-action="Edit" method="post" class="form-card">
+    <input type="hidden" asp-for="CommentId" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+
+    <div class="form-grid">
+        <div class="form-group span-2">
+            <label asp-for="MatchId">Match</label>
+            <select asp-for="MatchId" asp-items="matches" class="input">
+                <option value="0">Choose a match…</option>
+            </select>
+            <span asp-validation-for="MatchId" class="field-error"></span>
+        </div>
+
+        <div class="form-group span-2">
+            <label asp-for="CommentText"></label>
+            <textarea asp-for="CommentText" class="input" rows="5" maxlength="500"></textarea>
+            <span asp-validation-for="CommentText" class="field-error"></span>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a class="btn btn-ghost" asp-action="Index">Cancel</a>
+    </div>
+</form>

@@ -1,0 +1,123 @@
+@model ProfileVm
+@{
+    ViewData["Title"] = "My profile";
+    ViewData["Description"] = "Your account details, role and club affiliation.";
+    ViewData["PrimaryText"] = "Edit profile";
+    ViewData["PrimaryUrl"] = Url.Action("Edit", "Profile") ?? "/Profile/Edit";
+
+    var person = Model.Person;
+    var initials = $"{(person.FirstName.Length > 0 ? person.FirstName[0] : ' ')}{(person.LastName.Length > 0 ? person.LastName[0] : ' ')}".Trim().ToUpperInvariant();
+}
+
+<partial name="_PageHeader" />
+
+<div class="grid grid-2">
+    <div class="card">
+        <div class="player-top">
+            <div class="profile-photo-lg">
+                @if (!string.IsNullOrWhiteSpace(person.ProfilePhotoPath))
+                {
+                    <img src="@person.ProfilePhotoPath" alt="Profile photo of @person.FullName" />
+                }
+                else
+                {
+                    @initials
+                }
+            </div>
+            <div>
+                <h2 class="mb-0">@person.FullName</h2>
+                <p class="muted mb-1">@person.Username</p>
+                <div class="tag-list">
+                    @if (!string.IsNullOrWhiteSpace(Model.Role))
+                    {
+                        <span class="pill pill-gold">@Model.Role</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Model.ClubName))
+                    {
+                        <span class="pill pill-neutral">@Model.ClubName</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <dl class="kv">
+            <dt>Email</dt>
+            <dd>@person.Email</dd>
+            <dt>Phone</dt>
+            <dd>@person.Phone</dd>
+            <dt>Account created</dt>
+            <dd>@person.CreatedAt.ToString("dd MMM yyyy")</dd>
+            @if (!string.IsNullOrWhiteSpace(Model.ClubName))
+            {
+                <dt>Club</dt>
+                <dd>@Model.ClubName</dd>
+            }
+        </dl>
+
+        <div class="form-actions">
+            <a class="btn btn-primary" asp-controller="Profile" asp-action="Edit">Edit profile</a>
+            <a class="btn btn-secondary" asp-controller="Dashboard" asp-action="Index">Back to dashboard</a>
+        </div>
+    </div>
+
+    <div class="stack">
+        @if (Model.Player is not null)
+        {
+            var player = Model.Player;
+            <div class="card">
+                <div class="card-head"><h2>Player details</h2></div>
+                <dl class="kv">
+                    <dt>Jersey number</dt>
+                    <dd>@player.JerseyNumber</dd>
+                    <dt>Position</dt>
+                    <dd>@player.PositionName</dd>
+                    <dt>Nickname</dt>
+                    <dd>@player.Nickname</dd>
+                    <dt>Player style</dt>
+                    <dd>@(string.IsNullOrWhiteSpace(player.PlayerStyleName) ? "—" : player.PlayerStyleName)</dd>
+                    <dt>City</dt>
+                    <dd>@player.CityName, @player.ProvinceName</dd>
+                    <dt>Status</dt>
+                    <dd><span class="pill @(player.IsActive ? "pill-active" : "pill-inactive")">@(player.IsActive ? "Active" : "Inactive")</span></dd>
+                    <dt>Joined club</dt>
+                    <dd>@player.DateJoined.ToString("dd MMM yyyy")</dd>
+                </dl>
+                <div class="form-actions">
+                    <a class="btn btn-secondary btn-small" asp-controller="Statistics" asp-action="Mine">My statistics</a>
+                    <a class="btn btn-secondary btn-small" asp-controller="Injuries" asp-action="Index">My injuries</a>
+                </div>
+            </div>
+        }
+        else if (Model.Coach is not null)
+        {
+            var coach = Model.Coach;
+            <div class="card">
+                <div class="card-head"><h2>Coach details</h2></div>
+                <dl class="kv">
+                    <dt>Specialization</dt>
+                    <dd>@coach.SpecializationName</dd>
+                    <dt>Coaching licence</dt>
+                    <dd><span class="pill pill-gold">@coach.LicenseLevel</span></dd>
+                    <dt>Club</dt>
+                    <dd>@coach.ClubName</dd>
+                    <dt>Joined club</dt>
+                    <dd>@coach.DateJoined.ToString("dd MMM yyyy")</dd>
+                </dl>
+                <div class="form-actions">
+                    <a class="btn btn-secondary btn-small" asp-controller="Squads" asp-action="Index">My squads</a>
+                    <a class="btn btn-secondary btn-small" asp-controller="Players" asp-action="Index">View players</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-head"><h2>Need to change something?</h2></div>
+                <p class="muted small">Your name, email, phone number and profile photo can be updated from the edit page. Usernames and roles are managed by an administrator.</p>
+                <a class="btn btn-secondary btn-small" asp-controller="Profile" asp-action="Edit">Edit account details</a>
+            </div>
+        }
+    </div>
+</div>

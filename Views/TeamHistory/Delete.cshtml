@@ -1,0 +1,33 @@
+@model TeamHistoryRow
+@{
+    var clubName = ViewBag.ClubName as string ?? "your club";
+    ViewData["Title"] = "Delete club history";
+    ViewData["Description"] = $"Confirm that this entry should be removed from the story of {clubName}.";
+    ViewData["Crumb"] = "Team history";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+}
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <div class="alert alert-error" role="alert">
+        Deleting <strong>@Model.Title</strong> removes it from the club history permanently.
+    </div>
+
+    <dl class="kv">
+        <dt>Title</dt>
+        <dd>@Model.Title</dd>
+        <dt>Year</dt>
+        <dd>@Model.Year</dd>
+        <dt>Added by</dt>
+        <dd>@Model.AuthorName</dd>
+        <dt>Description</dt>
+        <dd>@Model.Description</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed" asp-route-id="@Model.HistoryId" method="post">
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Yes, delete entry</button>
+            <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

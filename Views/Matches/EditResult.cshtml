@@ -1,0 +1,51 @@
+@model MatchResultVm
+@{
+    ViewData["Title"] = "Edit result";
+    ViewData["Description"] = "Record the final scoreline and outcome for this match.";
+    ViewData["Crumb"] = "Matches";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Matches");
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <p class="notice mb-1">Result for <strong>@Model.Opponent</strong> on <strong>@Model.MatchDate.ToString("dddd dd MMMM yyyy")</strong>.</p>
+
+    <form asp-controller="Matches" asp-action="EditResult" method="post">
+        <input type="hidden" asp-for="MatchId" />
+        <input type="hidden" asp-for="Opponent" />
+        <input type="hidden" asp-for="MatchDate" />
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="Result">Outcome <span class="req">*</span></label>
+                <select asp-for="Result" class="input">
+                    <option value="">Choose the outcome</option>
+                    <option value="Win">Win</option>
+                    <option value="Draw">Draw</option>
+                    <option value="Loss">Loss</option>
+                </select>
+                <span asp-validation-for="Result" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GoalFor">Goals for <span class="req">*</span></label>
+                <input asp-for="GoalFor" class="input" type="number" min="0" max="99" />
+                <span asp-validation-for="GoalFor" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GoalAgainst">Goals against <span class="req">*</span></label>
+                <input asp-for="GoalAgainst" class="input" type="number" min="0" max="99" />
+                <span asp-validation-for="GoalAgainst" class="field-error"></span>
+            </div>
+        </div>
+
+        <p class="help mt-1">Make sure the outcome matches the scoreline: a win needs more goals for, a loss more goals against, a draw needs them level.</p>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save result</button>
+            <a class="btn btn-secondary" asp-controller="Matches" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

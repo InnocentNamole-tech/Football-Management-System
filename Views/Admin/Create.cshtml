@@ -1,0 +1,179 @@
+@model CreateAccountVm
+@{
+    ViewData["Title"] = "Create account";
+    ViewData["Description"] = "Add a person to the platform and give them the right role and club.";
+    ViewData["Crumb"] = "Accounts";
+    ViewData["CrumbUrl"] = Url.Action("Accounts", "Admin");
+
+    var clubs = ViewBag.Clubs as List<ClubRow> ?? new List<ClubRow>();
+    var cities = ViewBag.Cities as List<LookupItem> ?? new List<LookupItem>();
+    var positions = ViewBag.Positions as List<LookupItem> ?? new List<LookupItem>();
+    var styles = ViewBag.Styles as List<LookupItem> ?? new List<LookupItem>();
+    var specializations = ViewBag.Specializations as List<LookupItem> ?? new List<LookupItem>();
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <form asp-controller="Admin" asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+
+        <h2>Account details</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="FirstName">First name <span class="req">*</span></label>
+                <input asp-for="FirstName" class="input" autocomplete="off" />
+                <span asp-validation-for="FirstName" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName">Last name <span class="req">*</span></label>
+                <input asp-for="LastName" class="input" autocomplete="off" />
+                <span asp-validation-for="LastName" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email">Email <span class="req">*</span></label>
+                <input asp-for="Email" class="input" type="email" autocomplete="off" />
+                <span asp-validation-for="Email" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Username">Username <span class="req">*</span></label>
+                <input asp-for="Username" class="input" autocomplete="off" />
+                <span class="help">4 to 20 letters, digits or underscores.</span>
+                <span asp-validation-for="Username" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone">Phone <span class="req">*</span></label>
+                <input asp-for="Phone" class="input" type="tel" maxlength="10" autocomplete="off" />
+                <span class="help">10 digits, starting with 0.</span>
+                <span asp-validation-for="Phone" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateJoined">Date joined</label>
+                <input asp-for="DateJoined" class="input" type="date" />
+                <span class="help">Defaults to today for players.</span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password">Password <span class="req">*</span></label>
+                <input asp-for="Password" class="input" autocomplete="new-password" />
+                <span class="help">Minimum 8 characters with upper case, lower case, a digit and a special character.</span>
+                <span asp-validation-for="Password" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Confirm password <span class="req">*</span></label>
+                <input asp-for="ConfirmPassword" class="input" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+            </div>
+        </div>
+
+        <h2 class="section-title">Role and club</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="Role">Role <span class="req">*</span></label>
+                <select asp-for="Role" class="input">
+                    <option value="">Choose a role</option>
+                    <option value="@RoleNames.Admin">Admin</option>
+                    <option value="@RoleNames.Organiser">Organiser</option>
+                    <option value="@RoleNames.Coordinator">Coordinator</option>
+                    <option value="@RoleNames.Coach">Coach</option>
+                    <option value="@RoleNames.Player">Player</option>
+                    <option value="@RoleNames.Fan">Fan</option>
+                </select>
+                <span asp-validation-for="Role" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClubId">Club</label>
+                <select asp-for="ClubId" class="input">
+                    <option value="">No club (Admin / Organiser)</option>
+                    @foreach (var club in clubs)
+                    {
+                        <option value="@club.ClubId">@club.ClubName · @club.AgeGroup @club.Gender</option>
+                    }
+                </select>
+                <span class="help">Required for coordinator, coach, player and fan accounts.</span>
+                <span asp-validation-for="ClubId" class="field-error"></span>
+            </div>
+        </div>
+
+        <h2 class="section-title">Player details</h2>
+        <p class="muted small">Required when the role is Player. Ignored for every other role.</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="Nickname">Nickname</label>
+                <input asp-for="Nickname" class="input" />
+                <span asp-validation-for="Nickname" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="JerseyNumber">Jersey number</label>
+                <input asp-for="JerseyNumber" class="input" type="number" min="1" max="99" />
+                <span class="help">1 to 99, unique among active players in the club.</span>
+                <span asp-validation-for="JerseyNumber" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CityId">City</label>
+                <select asp-for="CityId" class="input">
+                    <option value="">Choose a city</option>
+                    @foreach (var city in cities)
+                    {
+                        <option value="@city.Id">@city.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="CityId" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PositionId">Position</label>
+                <select asp-for="PositionId" class="input">
+                    <option value="">Choose a position</option>
+                    @foreach (var position in positions)
+                    {
+                        <option value="@position.Id">@position.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="PositionId" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlayerStyleId">Player style</label>
+                <select asp-for="PlayerStyleId" class="input">
+                    <option value="">Choose a style</option>
+                    @foreach (var style in styles)
+                    {
+                        <option value="@style.Id">@style.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="PlayerStyleId" class="field-error"></span>
+            </div>
+        </div>
+
+        <h2 class="section-title">Coach details</h2>
+        <p class="muted small">Required when the role is Coach.</p>
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="SpecializationId">Specialization</label>
+                <select asp-for="SpecializationId" class="input">
+                    <option value="">Choose a specialization</option>
+                    @foreach (var specialization in specializations)
+                    {
+                        <option value="@specialization.Id">@specialization.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="SpecializationId" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LicenseLevel">Coaching licence</label>
+                <select asp-for="LicenseLevel" class="input">
+                    <option value="">Choose a licence</option>
+                    @foreach (var licence in CoachLicenseLevels.All)
+                    {
+                        <option value="@licence">@licence</option>
+                    }
+                </select>
+                <span class="help">Required when the role is Coach.</span>
+                <span asp-validation-for="LicenseLevel" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create account</button>
+            <a class="btn btn-secondary" asp-controller="Admin" asp-action="Accounts">Cancel</a>
+        </div>
+    </form>
+</div>

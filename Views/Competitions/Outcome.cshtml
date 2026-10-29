@@ -1,0 +1,55 @@
+@model OutcomeVm
+@{
+    ViewData["Title"] = "Record outcome";
+    ViewData["Description"] = "Mark how far this club went and whether it won the competition.";
+    ViewData["Crumb"] = "Competitions";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+    var stages = ViewBag.Stages as string[] ?? Array.Empty<string>();
+}
+<partial name="_PageHeader" />
+
+<div class="card stage-band">
+    <div>
+        <strong>@Model.CompetitionName</strong>
+        <span class="pill pill-muted">@Model.ClubName</span>
+    </div>
+    <p>Approved entry — record the final outcome.</p>
+</div>
+
+<form asp-action="Outcome" method="post" class="form-card">
+    <input type="hidden" asp-for="CompetitionClubId" />
+    <input type="hidden" asp-for="CompetitionName" />
+    <input type="hidden" asp-for="ClubName" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label asp-for="Outcome"></label>
+            <select asp-for="Outcome" class="input">
+                <option value="">Choose an outcome…</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Won">Won</option>
+                <option value="Lost">Lost</option>
+            </select>
+            <span asp-validation-for="Outcome" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="StageReached"></label>
+            <select asp-for="StageReached" class="input">
+                <option value="">Not reached yet</option>
+                @foreach (var stage in stages)
+                {
+                    <option value="@stage">@stage</option>
+                }
+            </select>
+            <span asp-validation-for="StageReached" class="field-error"></span>
+            <span class="help">Required for In Progress and Lost; ignored when the club won.</span>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save outcome</button>
+        <a class="btn btn-ghost" asp-action="Outcomes">Cancel</a>
+    </div>
+</form>

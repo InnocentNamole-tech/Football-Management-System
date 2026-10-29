@@ -1,0 +1,57 @@
+@model InjuryVm
+@{
+    ViewData["Title"] = "Record injury";
+    ViewData["Description"] = "Log a new injury and the estimated recovery period.";
+    ViewData["Crumb"] = "Injuries";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Injuries");
+
+    var players = ViewBag.Players as SelectList;
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <form asp-controller="Injuries" asp-action="Record" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="PlayerId">Player <span class="req">*</span></label>
+                <select asp-for="PlayerId" class="input" asp-items="players">
+                    <option value="">Choose a player</option>
+                </select>
+                <span asp-validation-for="PlayerId" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="InjuryType">Injury type <span class="req">*</span></label>
+                <input asp-for="InjuryType" class="input" placeholder="e.g. Hamstring strain" />
+                <span asp-validation-for="InjuryType" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="InjuryDate">Injury date <span class="req">*</span></label>
+                <input asp-for="InjuryDate" class="input" type="date" />
+                <span asp-validation-for="InjuryDate" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="EstimatedRecovery">Estimated recovery <span class="req">*</span></label>
+                <input asp-for="EstimatedRecovery" class="input" placeholder="e.g. 3 weeks" />
+                <span asp-validation-for="EstimatedRecovery" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ActualRecovery">Actual recovery</label>
+                <input asp-for="ActualRecovery" class="input" placeholder="Leave blank while still in rehab" />
+                <span class="help">Fill this in once the player is back in training.</span>
+                <span asp-validation-for="ActualRecovery" class="field-error"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Record injury</button>
+            <a class="btn btn-secondary" asp-controller="Injuries" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>

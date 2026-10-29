@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Access denied";
+    ViewData["Description"] = "Your account does not have permission to open that page.";
+}
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+    <span class="sep">/</span>
+    <span aria-current="page">@ViewData["Title"]</span>
+</nav>
+
+<div class="card fade-up text-center">
+    <p class="status-code">403</p>
+    <h1>Not your dugout</h1>
+    <p class="muted">This area belongs to another role or another club. Sign in with the right account, or return to your own dashboard.</p>
+    <div class="btn-row center-actions">
+        <a class="btn btn-primary" asp-controller="Dashboard" asp-action="Index">Back to dashboard</a>
+        <form asp-controller="Account" asp-action="Logout" method="post" class="inline-form">
+            <button type="submit" class="btn btn-secondary">Switch account</button>
+        </form>
+    </div>
+</div>

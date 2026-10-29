@@ -1,0 +1,50 @@
+@model List<ClubRow>
+@{
+    ViewData["Title"] = "Clubs";
+    ViewData["Description"] = "Every club on the platform, with its home city and stadium.";
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No clubs yet</h3>
+        <p>The system administrator registers clubs and links them to a home city and stadium.</p>
+        @if (User.IsInRole(RoleNames.Admin))
+        {
+            <a class="btn btn-primary btn-small" asp-controller="Clubs" asp-action="Create">Register the first club</a>
+        }
+    </div>
+}
+else
+{
+    <div class="grid grid-3">
+        @foreach (var club in Model)
+        {
+            <article class="card">
+                <div class="card-head">
+                    <h2>@club.ClubName</h2>
+                    <span class="pill pill-gold">@club.AgeGroup</span>
+                </div>
+                <dl class="kv">
+                    <dt>City</dt>
+                    <dd>@club.CityName</dd>
+                    <dt>Province</dt>
+                    <dd>@club.ProvinceName</dd>
+                    <dt>Stadium</dt>
+                    <dd>@club.StadiumName</dd>
+                    <dt>Capacity</dt>
+                    <dd>@club.Capacity.ToString("N0")</dd>
+                    <dt>Founded</dt>
+                    <dd>@club.FoundedYear</dd>
+                    <dt>Team</dt>
+                    <dd>@club.Gender</dd>
+                </dl>
+                <div class="form-actions">
+                    <a class="btn btn-secondary btn-small" asp-controller="Clubs" asp-action="Details" asp-route-id="@club.ClubId">View club</a>
+                </div>
+            </article>
+        }
+    </div>
+}

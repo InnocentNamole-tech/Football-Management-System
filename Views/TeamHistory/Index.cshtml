@@ -1,0 +1,50 @@
+@model List<TeamHistoryRow>
+@{
+    var canManage = ViewBag.CanManage is true;
+    var clubName = ViewBag.ClubName as string ?? "Club";
+    ViewData["Title"] = "Team history";
+    ViewData["Description"] = $"The story of {clubName}, season by season.";
+    if (canManage)
+    {
+        ViewData["PrimaryText"] = "Add history";
+        ViewData["PrimaryUrl"] = Url.Action("Create");
+    }
+}
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="card empty">
+        <h3>No history recorded yet</h3>
+        <p>The club story will appear here once the coordinator adds the first milestone.</p>
+        @if (canManage)
+        {
+            <a class="btn btn-primary" asp-action="Create">Add the first entry</a>
+        }
+    </div>
+}
+else
+{
+    <div class="grid grid-2">
+        @foreach (var item in Model)
+        {
+            <article class="card announcement">
+                <header>
+                    <h3>@item.Title</h3>
+                    <span class="pill pill-gold">@item.Year</span>
+                </header>
+                <p>@item.Description</p>
+                <footer>
+                    <span>@item.AuthorName</span>
+                    @if (canManage)
+                    {
+                        <span class="btn-row">
+                            <a class="btn btn-small btn-ghost" asp-action="Edit" asp-route-id="@item.HistoryId">Edit</a>
+                            <a class="btn btn-small btn-ghost" asp-action="Delete" asp-route-id="@item.HistoryId">Delete</a>
+                        </span>
+                    }
+                </footer>
+            </article>
+        }
+    </div>
+}

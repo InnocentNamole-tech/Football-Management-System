@@ -1,0 +1,152 @@
+@model CompetitionVm
+@{
+    ViewData["Title"] = "Create competition";
+    ViewData["Description"] = "Set the format, dates, entry fee and rewards for a new competition.";
+    ViewData["Crumb"] = "Competitions";
+    ViewData["CrumbUrl"] = Url.Action("Index");
+    var stadiums = ViewBag.Stadiums as SelectList;
+}
+<partial name="_PageHeader" />
+
+<form asp-action="Create" method="post" class="form-card">
+    <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+
+    <div class="form-grid">
+        <div class="form-group span-2">
+            <label asp-for="CompetitionName"></label>
+            <input asp-for="CompetitionName" class="input" maxlength="100" />
+            <span asp-validation-for="CompetitionName" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CompetitionType"></label>
+            <select asp-for="CompetitionType" class="input">
+                <option value="Friendly">Friendly</option>
+                <option value="League">League</option>
+                <option value="Cup">Cup</option>
+                <option value="Tournament">Tournament</option>
+                <option value="Exhibition">Exhibition</option>
+            </select>
+            <span asp-validation-for="CompetitionType" class="field-error"></span>
+            <span class="help">Friendly competitions are saved with no rewards.</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CompetitionStatus"></label>
+            <select asp-for="CompetitionStatus" class="input">
+                <option value="Upcoming">Upcoming</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+            </select>
+            <span asp-validation-for="CompetitionStatus" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Gender"></label>
+            <select asp-for="Gender" class="input">
+                <option value="Men">Men</option>
+                <option value="Women">Women</option>
+                <option value="Mixed">Mixed</option>
+            </select>
+            <span asp-validation-for="Gender" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="AgeGroup"></label>
+            <select asp-for="AgeGroup" class="input">
+                <option value="U13">U13</option>
+                <option value="U15">U15</option>
+                <option value="U17">U17</option>
+                <option value="U19">U19</option>
+                <option value="Senior">Senior</option>
+            </select>
+            <span asp-validation-for="AgeGroup" class="field-error"></span>
+        </div>
+
+        <div class="form-group span-2">
+            <label asp-for="StadiumId"></label>
+            <select asp-for="StadiumId" asp-items="stadiums" class="input">
+                <option value="0">Choose a stadium…</option>
+            </select>
+            <span asp-validation-for="StadiumId" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="StartDate"></label>
+            <input asp-for="StartDate" type="date" class="input" />
+            <span asp-validation-for="StartDate" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="StartTime"></label>
+            <input asp-for="StartTime" type="time" class="input" />
+            <span asp-validation-for="StartTime" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="EndDate"></label>
+            <input asp-for="EndDate" type="date" class="input" />
+            <span asp-validation-for="EndDate" class="field-error"></span>
+            <span class="help">The end date cannot be before the start date.</span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="TeamCount"></label>
+            <input asp-for="TeamCount" type="number" min="2" max="128" class="input" />
+            <span asp-validation-for="TeamCount" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="AffiliationFee"></label>
+            <input asp-for="AffiliationFee" type="number" min="0" step="0.01" class="input" />
+            <span asp-validation-for="AffiliationFee" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="RewardPrice"></label>
+            <input asp-for="RewardPrice" type="number" min="0" class="input" />
+            <span asp-validation-for="RewardPrice" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IndividualAward"></label>
+            <select asp-for="IndividualAward" class="input">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select>
+            <span asp-validation-for="IndividualAward" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="TrophyMedal"></label>
+            <select asp-for="TrophyMedal" class="input">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select>
+            <span asp-validation-for="TrophyMedal" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Promotion"></label>
+            <select asp-for="Promotion" class="input">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select>
+            <span asp-validation-for="Promotion" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="KitSet"></label>
+            <select asp-for="KitSet" class="input">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select>
+            <span asp-validation-for="KitSet" class="field-error"></span>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Create competition</button>
+        <a class="btn btn-ghost" asp-action="Index">Cancel</a>
+    </div>
+</form>

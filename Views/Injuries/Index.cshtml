@@ -1,0 +1,79 @@
+@model List<InjuryRow>
+@{
+    var ownOnly = ViewBag.OwnOnly is true;
+    var canEdit = ViewBag.CanEdit is true;
+    ViewData["Title"] = ownOnly ? "My injuries" : "Injuries";
+    ViewData["Description"] = ownOnly
+        ? "Your injury history and recovery status."
+        : "Injury history for the club, including players still in rehabilitation.";
+
+    if (canEdit)
+    {
+        ViewData["PrimaryText"] = "Record injury";
+        ViewData["PrimaryUrl"] = Url.Action("Record", "Injuries") ?? "/Injuries/Record";
+    }
+}
+
+<partial name="_PageHeader" />
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>@(ownOnly ? "No injuries recorded" : "No injuries on record")</h3>
+        <p>@(ownOnly ? "Good news — nothing has been recorded against your profile." : "The treatment room is empty. Injuries appear here once they are recorded.")</p>
+        @if (canEdit)
+        {
+            <a class="btn btn-primary btn-small" asp-controller="Injuries" asp-action="Record">Record an injury</a>
+        }
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Player</th>
+                <th>Injury</th>
+                <th>Date</th>
+                <th>Estimated recovery</th>
+                <th>Actual recovery</th>
+                <th>Status</th>
+                @if (canEdit)
+                {
+                    <th>Actions</th>
+                }
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var injury in Model)
+            {
+                <tr>
+                    <td><strong>@injury.PlayerName</strong><br /><small>#@injury.JerseyNumber</small></td>
+                    <td>@injury.InjuryType</td>
+                    <td class="nowrap">@injury.InjuryDate.ToString("dd MMM yyyy")</td>
+                    <td>@injury.EstimatedRecovery</td>
+                    <td>@(string.IsNullOrWhiteSpace(injury.ActualRecovery) ? "—" : injury.ActualRecovery)</td>
+                    <td>
+                        @if (string.IsNullOrWhiteSpace(injury.ActualRecovery))
+                        {
+                            <span class="pill pill-pending">Rehabilitation</span>
+                        }
+                        else
+                        {
+                            <span class="pill pill-approved">Recovered</span>
+                        }
+                    </td>
+                    @if (canEdit)
+                    {
+                        <td>
+                            <a class="btn btn-secondary btn-small" asp-controller="Injuries" asp-action="Edit" asp-route-id="@injury.InjuryHistoryId">Edit</a>
+                        </td>
+                    }
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="table-note">@Model.Count injury record@(Model.Count == 1 ? "" : "s").</p>
+}

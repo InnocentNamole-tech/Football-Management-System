@@ -1,0 +1,86 @@
+@model List<StatLineRow>
+@{
+    var match = ViewBag.Match as MatchRow;
+    ViewData["Title"] = match is null ? "Match statistics" : $"vs {match.Opponent}";
+    ViewData["Description"] = "Player statistics recorded for this match.";
+    ViewData["Crumb"] = "Statistics";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Statistics");
+
+    if (match is not null)
+    {
+        ViewData["PrimaryText"] = "Add statistics";
+        ViewData["PrimaryUrl"] = Url.Action("Add", "Statistics", new { matchId = match.MatchId });
+    }
+}
+
+<partial name="_PageHeader" />
+
+@if (match is not null)
+{
+    <div class="card mb-1">
+        <div class="flex-between">
+            <div>
+                <h2 class="mb-0">@match.ClubName vs @match.Opponent</h2>
+                <p class="muted small mb-0">@match.MatchDate.ToString("dddd dd MMMM yyyy") · @match.StadiumName</p>
+            </div>
+            <div class="text-right">
+                <div class="scoreline">@match.Scoreline</div>
+                <span class="result @(match.Result == "Win" ? "result-win" : match.Result == "Loss" ? "result-loss" : "result-draw")">@match.Result</span>
+            </div>
+        </div>
+    </div>
+}
+
+@if (Model.Count == 0)
+{
+    <div class="empty">
+        <h3>No statistics recorded</h3>
+        <p>Add a stat line for each player who featured in this match.</p>
+        @if (match is not null)
+        {
+            <a class="btn btn-primary btn-small" asp-controller="Statistics" asp-action="Add" asp-route-matchId="@match.MatchId">Add statistics</a>
+        }
+    </div>
+}
+else
+{
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+            <tr>
+                <th>Player</th>
+                <th>#</th>
+                <th>Goals</th>
+                <th>Assists</th>
+                <th>Yellow</th>
+                <th>Red</th>
+                <th>Minutes</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var row in Model)
+            {
+                <tr>
+                    <td><strong>@row.PlayerName</strong></td>
+                    <td>@row.JerseyNumber</td>
+                    <td>@row.Goal</td>
+                    <td>@row.Assist</td>
+                    <td>@row.YellowCard</td>
+                    <td>@row.RedCard</td>
+                    <td>@row.MinutesPlayed</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-head"><h2>Match totals</h2></div>
+        <div class="stat-grid">
+            <div class="stat"><div class="value">@Model.Sum(r => r.Goal)</div><div class="label">Goals</div></div>
+            <div class="stat"><div class="value">@Model.Sum(r => r.Assist)</div><div class="label">Assists</div></div>
+            <div class="stat"><div class="value">@Model.Sum(r => r.YellowCard)</div><div class="label">Yellow cards</div></div>
+            <div class="stat"><div class="value">@Model.Sum(r => r.RedCard)</div><div class="label">Red cards</div></div>
+        </div>
+    </div>
+}

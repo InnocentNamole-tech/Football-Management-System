@@ -1,0 +1,83 @@
+@model List<PlayerMatchStatRow>
+@{
+    var player = ViewBag.Player as PlayerOverview;
+    var totals = ViewBag.Totals as PlayerTotalsRow;
+    ViewData["Title"] = "My statistics";
+    ViewData["Description"] = "Your appearances, goals, assists, cards and minutes for the season.";
+    ViewData["Crumb"] = "My profile";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Profile");
+}
+
+<partial name="_PageHeader" />
+
+@if (player is not null)
+{
+    <div class="card mb-1">
+        <div class="flex-between">
+            <div>
+                <h2 class="mb-0">@player.FullName</h2>
+                <p class="muted small mb-0">#@player.JerseyNumber · @player.PositionName · @player.ClubName</p>
+            </div>
+            <span class="pill @(player.IsActive ? "pill-active" : "pill-inactive")">@(player.IsActive ? "Active" : "Inactive")</span>
+        </div>
+    </div>
+}
+
+@if (totals is not null)
+{
+    <div class="stat-grid">
+        <div class="stat"><div class="value">@totals.MatchesPlayed</div><div class="label">Appearances</div></div>
+        <div class="stat"><div class="value">@totals.Goals</div><div class="label">Goals</div></div>
+        <div class="stat"><div class="value">@totals.Assists</div><div class="label">Assists</div></div>
+        <div class="stat"><div class="value">@totals.YellowCards</div><div class="label">Yellow cards</div></div>
+        <div class="stat"><div class="value">@totals.RedCards</div><div class="label">Red cards</div></div>
+        <div class="stat"><div class="value">@totals.MinutesPlayed</div><div class="label">Minutes</div></div>
+    </div>
+}
+
+<div class="card mt-2">
+    <div class="card-head"><h2>Match by match</h2></div>
+
+    @if (Model.Count == 0)
+    {
+        <div class="empty">
+            <h3>No match statistics yet</h3>
+            <p>Your numbers appear here once the coordinator records your first match.</p>
+            <a class="btn btn-secondary btn-small" asp-controller="Matches" asp-action="Fixtures">View fixtures</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="data">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Opponent</th>
+                    <th>Result</th>
+                    <th>Goals</th>
+                    <th>Assists</th>
+                    <th>Yellow</th>
+                    <th>Red</th>
+                    <th>Minutes</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var row in Model)
+                {
+                    <tr>
+                        <td class="nowrap">@row.MatchDate.ToString("dd MMM yyyy")</td>
+                        <td><strong>vs @row.Opponent</strong></td>
+                        <td><span class="result @(row.Result == "Win" ? "result-win" : row.Result == "Loss" ? "result-loss" : "result-draw")">@row.Result</span></td>
+                        <td>@row.Goal</td>
+                        <td>@row.Assist</td>
+                        <td>@row.YellowCard</td>
+                        <td>@row.RedCard</td>
+                        <td>@row.MinutesPlayed</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,62 @@
+@model MatchCreateVm
+@{
+    ViewData["Title"] = "Create match";
+    ViewData["Description"] = "Schedule a fixture, pick the venue and optionally link an approved competition.";
+    ViewData["Crumb"] = "Matches";
+    ViewData["CrumbUrl"] = Url.Action("Index", "Matches");
+
+    var competitions = ViewBag.Competitions as SelectList;
+    var stadiums = ViewBag.Stadiums as SelectList;
+}
+
+<partial name="_PageHeader" />
+
+<div class="card form-card">
+    <form asp-controller="Matches" asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-error" role="alert"></div>
+
+        <div class="form-grid">
+            <div class="form-group span-2">
+                <label asp-for="Opponent">Opponent <span class="req">*</span></label>
+                <input asp-for="Opponent" class="input" autocomplete="off" />
+                <span asp-validation-for="Opponent" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CompetitionId">Competition</label>
+                <select asp-for="CompetitionId" class="input" asp-items="competitions">
+                    <option value="">No competition (friendly)</option>
+                </select>
+                <span class="help">Only competitions your club is approved in are listed.</span>
+                <span asp-validation-for="CompetitionId" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StadiumId">Stadium <span class="req">*</span></label>
+                <select asp-for="StadiumId" class="input" asp-items="stadiums">
+                    <option value="">Choose a stadium</option>
+                </select>
+                <span asp-validation-for="StadiumId" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MatchDate">Match date <span class="req">*</span></label>
+                <input asp-for="MatchDate" class="input" type="date" />
+                <span asp-validation-for="MatchDate" class="field-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="KickoffTime">Kickoff time <span class="req">*</span></label>
+                <input asp-for="KickoffTime" class="input" type="time" />
+                <span asp-validation-for="KickoffTime" class="field-error"></span>
+            </div>
+        </div>
+
+        <p class="help mb-0">The matchday formation and squad are set by the coach from the squad builder after the fixture is created.</p>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create match</button>
+            <a class="btn btn-secondary" asp-controller="Matches" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</div>
